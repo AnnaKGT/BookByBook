@@ -1,4 +1,5 @@
 
+import 'package:book_by_book/constants/routes.dart';
 import 'package:book_by_book/firebase_options.dart';
 import 'package:book_by_book/views/login_view.dart';
 import 'package:book_by_book/views/register_view.dart';
@@ -16,9 +17,9 @@ void main() {
       ),
       home: const HomePage(),
       routes: {
-        '/login/': (context) => const LoginView(),
-        '/register/': (context) => const RegisterView(),
-        '/mainpage/': (context) => const MainPage()
+        loginRoute: (context) => const LoginView(),
+        registerRoute: (context) => const RegisterView(),
+        mainPageRoute: (context) => const MainPage()
       },
     ),);
 }
@@ -84,7 +85,7 @@ class _MainPageState extends State<MainPage> {
                   if (shouldLogout) {
                     await FirebaseAuth.instance.signOut();
                     Navigator.of(context).pushNamedAndRemoveUntil(
-                      '/login/', 
+                      loginRoute, 
                       (_) => false,
                       );
                   }

@@ -1,4 +1,5 @@
 
+import 'package:book_by_book/constants/routes.dart';
 import 'package:book_by_book/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -76,7 +77,7 @@ class _LoginViewState extends State<LoginView> {
                       password: password,
                       );
                     Navigator.of(context).pushNamedAndRemoveUntil(
-                      '/mainpage/', 
+                      mainPageRoute, 
                       (route) => false);
                   } on FirebaseAuthException catch (e) {
                     if (e.code == 'user-not-found') {
@@ -99,7 +100,7 @@ class _LoginViewState extends State<LoginView> {
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pushNamedAndRemoveUntil(
-                      '/register/',
+                      registerRoute,
                       (route) => false);
                   }, 
                   child: const Text("Not registered yet? Sign up here!"))
