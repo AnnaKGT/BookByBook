@@ -1,6 +1,7 @@
 
 import 'package:book_by_book/constants/routes.dart';
 import 'package:book_by_book/firebase_options.dart';
+import 'package:book_by_book/show_error_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -70,27 +71,41 @@ class _RegisterViewState extends State<RegisterView> {
 
                   final email = _email.text;
                   final password = _password.text;
+
+                  if (email.isEmpty || password.isEmpty) {
+                    await showErrorDialog(context, "Email and password cannot be empty");
+                    return;
+                  }
+
                   try {
-                    final userCredential =
                   await FirebaseAuth.instance.createUserWithEmailAndPassword(
                     email: email, 
                     password: password,
                     );
-                  devtools.log(userCredential.toString());
+                  
+                  if (!context.mounted) return;
+                  final user = FirebaseAuth.instance.currentUser;
+                  await user?.sendEmailVerification();
+
+                  Navigator.of(context).pushNamed(verifyEmailRoute);
 
                   } on FirebaseAuthException catch (e) {
+                    if (!context.mounted) return;
+
                     if (e.code == 'weak-password') {
-                      devtools.log('Weak password');
+                      await showErrorDialog(context, 'Weak password');
                     } else if (e.code == 'email-already-in-use') {
-                      devtools.log('Email already in use');
+                      await showErrorDialog(context, 'Email is already in use');
                     } else if (e.code == 'invalid-email') {
-                      devtools.log('Invalid email');
+                      await showErrorDialog(context, 'Invalid email');
                     } else {
-                      devtools.log('FirebaseAuthException: ${e.code} - ${e.message}');
+                      devtools.log('Error: ${e.code} - ${e.message}');
                     }               
-                  }
-                  
-          
+                  } catch (e, stack) {
+                      devtools.log('Unexpected error', error: e, stackTrace: stack);
+                      if (!context.mounted) return;
+                      await showErrorDialog(context, "Something went wrong. Try again.");
+                    }          
                 }, 
                 child: const Text('Register'),
                 ),
