@@ -1,10 +1,10 @@
 
 import 'package:book_by_book/constants/routes.dart';
 import 'package:book_by_book/firebase_options.dart';
-import 'package:book_by_book/show_error_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as devtools show log;
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -68,39 +68,50 @@ class _LoginViewState extends State<LoginView> {
               TextButton(
                 onPressed: () async {
 
-                  final email = _email.text;
-                  final password = _password.text;
-                  
+                  final email = _email.text.trim();
+                  final password = _password.text.trim();
+
+                  if (email.isEmpty || password.isEmpty) {
+                    await showErrorDialog(context, "Email and password cannot be empty");
+                    return;
+                  }
+                                
                   try {
                     await FirebaseAuth.instance.signInWithEmailAndPassword(
                       email: email, 
                       password: password,
                       );
+                    
+                    if (!context.mounted) return;
+
                     Navigator.of(context).pushNamedAndRemoveUntil(
                       mainPageRoute, 
                       (route) => false);
                   } on FirebaseAuthException catch (e) {
-                    if (e.code == 'user-not-found') {
-                      await showErrorDialog(context, "User not found");
-                      
-                    } else if (e.code == 'wrong-password') {
-                      await showErrorDialog(context, "Wrong password");
-                      
+                    if (!context.mounted) return;
+
+                    switch (e.code) {
+                      case 'user-not-found':
+                        await showErrorDialog(context, "User not found");
+                        break;
+                      case 'wrong-password':
+                        await showErrorDialog(context, "Wrong password");
+                        break;
+                      case 'invalid-credential':
+                        await showErrorDialog(context, "Invalid credentials");
+                        break;
+                      default:
+                        await showErrorDialog(context, "Error: ${e.message ?? e.code}");
+                        devtools.log(
+                          'FirebaseAuthException: ${e.code} - ${e.message}',
+                        );
                     }
-                      else if (e.code == 'invalid-credential') {
-                      await showErrorDialog(context, "Invalid credential");
-                       
-                    } else {
-                      await showErrorDialog(context, "Error:  ${e.code}");
-                    }
-                   
-                  } catch (e) {
-                    await showErrorDialog(context, "Error:  ${e.toString()}");
-                  }
-                  
-          
-                }, 
-                child: const Text('Log in'),
+                    } catch (e, stack) {
+                      devtools.log('Unexpected error', error: e, stackTrace: stack);
+                      if (!context.mounted) return;
+                      await showErrorDialog(context, "Something went wrong. Try again.");
+                    }                
+                  }, child: const Text('Log in'),
                 ),
                 TextButton(
                   onPressed: () {
@@ -121,5 +132,29 @@ class _LoginViewState extends State<LoginView> {
     );
   }
   
+}
+
+
+Future<void> showErrorDialog(
+  BuildContext context,
+  String text,
+) {
+  return showDialog(
+    context: context, 
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('An error occurred'),
+        content: Text(text),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            }, 
+            child: const Text('OK')
+            )
+        ],
+      );
+
+    });
 }
 
