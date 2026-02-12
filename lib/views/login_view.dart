@@ -1,8 +1,8 @@
 
 import 'package:book_by_book/constants/routes.dart';
 import 'package:book_by_book/firebase_options.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:book_by_book/services/auth/auth_exceptions.dart';
+import 'package:book_by_book/services/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
@@ -38,9 +38,7 @@ class _LoginViewState extends State<LoginView> {
         title: const Text('Log in'),
         ),
       body: FutureBuilder(
-        future: Firebase.initializeApp(
-                    options: DefaultFirebaseOptions.currentPlatform,
-                  ),
+        future: AuthService.firebase().initialize(),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
 
@@ -77,16 +75,16 @@ class _LoginViewState extends State<LoginView> {
                   }
                                 
                   try {
-                    await FirebaseAuth.instance.signInWithEmailAndPassword(
+                    await AuthService.firebase().logIn(
                       email: email, 
                       password: password,
                       );
                     
                     if (!context.mounted) return;
 
-                    final user = FirebaseAuth.instance.currentUser;
+                    final user = AuthService.firebase().currentUser;
 
-                    if (user?.emailVerified ?? false) {
+                    if (user?.isEmailVerified ?? false) {
                       // user's email is verified
                       Navigator.of(context).pushNamedAndRemoveUntil(
                       mainPageRoute, 
@@ -97,32 +95,16 @@ class _LoginViewState extends State<LoginView> {
                       Navigator.of(context).pushNamed(
                       verifyEmailRoute);
                     }
-
-                    
-                  } on FirebaseAuthException catch (e) {
-                    if (!context.mounted) return;
-
-                    switch (e.code) {
-                      case 'user-not-found':
-                        await showErrorDialog(context, "User not found");
-                        break;
-                      case 'wrong-password':
-                        await showErrorDialog(context, "Wrong password");
-                        break;
-                      case 'invalid-credential':
-                        await showErrorDialog(context, "Invalid credentials");
-                        break;
-                      default:
-                        await showErrorDialog(context, "Error: ${e.message ?? e.code}");
-                        devtools.log(
-                          'FirebaseAuthException: ${e.code} - ${e.message}',
-                        );
-                    }
-                    } catch (e, stack) {
-                      devtools.log('Unexpected error', error: e, stackTrace: stack);
-                      if (!context.mounted) return;
-                      await showErrorDialog(context, "Something went wrong. Try again.");
-                    }                
+                  } on UserNotFoundAuthException {
+                    await showErrorDialog(context, "User not found");
+                  } on WrongPasswordAuthException {
+                    await showErrorDialog(context, "Wrong password");
+                  } on InvalidCredentialsAuthException {
+                    await showErrorDialog(context, "Invalid credentials");
+                  } on GenericAuthException {
+                     await showErrorDialog(context, "Something went wrong. Try again.");
+                  }
+                          
                   }, child: const Text('Log in'),
                 ),
                 TextButton(
