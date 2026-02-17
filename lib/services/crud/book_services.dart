@@ -1,4 +1,6 @@
 
+import 'dart:async';
+
 import 'package:book_by_book/services/crud/crud_exceptions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
@@ -9,15 +11,46 @@ import 'package:path/path.dart'show join;
 class BooksService {
   Database? _db;
 
+  List<DatabaseBook> _books = [];
+
+  static final BooksService _shared = BooksService._sharedInstance();
+  BooksService._sharedInstance();
+  factory BooksService() => _shared;
+
+  final _booksStreamConroller = StreamController<List<DatabaseBook>>.broadcast();
+
+  Stream<List<DatabaseBook>> get allBooks => _booksStreamConroller.stream;
+
+  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+   try {
+    final user = await getUser(email: email);
+    return user;
+   } on CouldNotFindUser {
+    final createdUser = await createUser(email: email);
+    return createdUser;
+   } catch (e) {
+    rethrow;
+   }
+  }
+
+  Future<void> _cacheBooks() async {
+    final allBooks = await getAllBooks();
+    _books = allBooks.toList();
+    _booksStreamConroller.add(_books);
+  }
+
   Future<DatabaseBook> updateBook({
+    
     required DatabaseBook book,
     required String bookAuthor,
     required String bookTitle,
     }) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
 
     await getBook(id: book.id);
 
+    // update DB
     final updatesCount = await db.update(bookTable, {
       bookAuthor: bookAuthor,
       bookTitle: bookTitle,
@@ -28,11 +61,16 @@ class BooksService {
     if (updatesCount == 0) {
       throw CouldNotUpdateBook();
     } else {
-      return await getBook(id: book.id);
+      final updatedBook = await getBook(id: book.id);
+      _books.removeWhere((book) => book.id == updatedBook.id);
+      _books.add(updatedBook);
+      _booksStreamConroller.add(_books);
+      return updatedBook;
     }
   }
 
   Future<Iterable<DatabaseBook>> getAllBooks() async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final books = await db.query(
       bookTable,
@@ -42,6 +80,7 @@ class BooksService {
 
   Future<DatabaseBook> getBook({required int id}) async {
     final db = _getDatabaseOrThrow();
+    await _ensureDbIsOpen();
     final books = await db.query(
       bookTable,
       limit: 1,
@@ -52,16 +91,25 @@ class BooksService {
     if (books.isEmpty) {
       throw CouldNotFindBook();
     } else {
-      return DatabaseBook.fromRow(books.first);
+      final book = DatabaseBook.fromRow(books.first);
+      _books.removeWhere((book) => book.id == id);
+      _books.add(book);
+      _booksStreamConroller.add(_books);
+      return book;
     }
   }
 
   Future<int> deleteAllBooks() async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
-    return await db.delete(bookTable);
+    final numberOfDeletions = await db.delete(bookTable);
+    _books = [];
+    _booksStreamConroller.add(_books);
+    return numberOfDeletions;
   }
 
   Future<void> deleteBook({required int id}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final deleteCount = await db.delete(
       bookTable,
@@ -71,10 +119,15 @@ class BooksService {
 
     if (deleteCount == 0) {
       throw CouldNotDeleteBook();
+    } else {
+      _books.removeWhere((book) => book.id == id);
+      _booksStreamConroller.add(_books);
+
     }
   }
 
   Future<DatabaseBook> createBook({required DatabaseUser owner}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
 
     // make sure owner exists in the database with the correct id
@@ -102,10 +155,14 @@ class BooksService {
       bookTitle: bookTitle, 
       isSyncedWithCloud: true);
 
+    _books.add(book);
+    _booksStreamConroller.add(_books);
+
     return book;
   }
 
   Future<DatabaseUser> getUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final results = await db.query(
         userTable, 
@@ -124,6 +181,7 @@ class BooksService {
   }
 
   Future<DatabaseUser> createUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final results = await db.query(
       userTable, 
@@ -147,6 +205,7 @@ class BooksService {
   }
 
   Future<void> deleteUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final  deletedCount = await db.delete(
       userTable, 
@@ -178,6 +237,15 @@ class BooksService {
     }
   }
 
+  Future<void> _ensureDbIsOpen() async {
+    try {
+      await open();
+
+    } on DatabaseAlreadyOpenExeception {
+      // empty
+    }
+  }
+
   Future<void> open() async {
     if (_db != null) {
       throw DatabaseAlreadyOpenExeception();
@@ -192,6 +260,7 @@ class BooksService {
       await db.execute(createUserTable);
       // create the books table
       await db.execute(createBookTable);
+      await _cacheBooks();
 
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocumentsDirectory();

@@ -1,6 +1,7 @@
 import 'package:book_by_book/constants/routes.dart';
 import 'package:book_by_book/enums/menu_action.dart';
 import 'package:book_by_book/services/auth/auth_service.dart';
+import 'package:book_by_book/services/crud/book_services.dart';
 import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {
@@ -11,6 +12,22 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  late final BooksService _booksService;
+  String get userEmail => AuthService.firebase().currentUser!.email!;
+
+  @override
+  void initState() {
+    _booksService = BooksService();
+    _booksService.open();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _booksService.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +62,30 @@ class _MainPageState extends State<MainPage> {
             ),
         ],
       ),
-      body: const Text('BookByBook')
+      body: FutureBuilder(
+        future: _booksService.getOrCreateUser(email: userEmail), 
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+
+            case ConnectionState.done:
+              return StreamBuilder(
+                stream: _booksService.allBooks, 
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    
+                    case ConnectionState.waiting:
+                      return const Text('Waiting for all books');
+                    default:
+                     return const CircularProgressIndicator();
+                  }
+                },
+              );
+              default:
+               return const CircularProgressIndicator();
+          }
+        },
+        ),
+
     );
   }
 }
