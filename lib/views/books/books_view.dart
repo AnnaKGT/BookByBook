@@ -78,7 +78,8 @@ class _MainPageState extends State<MainPage> {
                 stream: _booksService.allBooks, 
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
-                    
+                    case ConnectionState.active:
+                      return const Text('Here all your books');
                     case ConnectionState.waiting:
                       return const Text('Waiting for all books');
                     default:
