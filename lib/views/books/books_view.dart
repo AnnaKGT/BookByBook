@@ -32,8 +32,14 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Main Page'),
+        title: const Text('All Books'),
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(newBookRoute);
+            }, 
+            icon: const Icon(Icons.add),
+            ),
           PopupMenuButton<MenuAction> (
             onSelected: (value) async {
               switch (value) {
@@ -55,7 +61,7 @@ class _MainPageState extends State<MainPage> {
               return const [
                 PopupMenuItem<MenuAction>(
                 value: MenuAction.logout,
-                child: Text('Log out') 
+                child: Text('Log out')
                 ),
               ];             
             }

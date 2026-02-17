@@ -1,10 +1,8 @@
 
 import 'package:book_by_book/constants/routes.dart';
-import 'package:book_by_book/firebase_options.dart';
 import 'package:book_by_book/services/auth/auth_exceptions.dart';
 import 'package:book_by_book/services/auth/auth_service.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as devtools show log;
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
