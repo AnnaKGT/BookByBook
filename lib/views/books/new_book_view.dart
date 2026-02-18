@@ -39,7 +39,6 @@ class _NewBookViewState extends State<NewBookView> {
       //bookAuthor: textAuthor, 
       bookTitle: textTitle,
       );
-    print(book);
   }
 
   void _setupTextControllerListener() {

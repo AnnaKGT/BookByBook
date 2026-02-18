@@ -2,6 +2,8 @@ import 'package:book_by_book/constants/routes.dart';
 import 'package:book_by_book/enums/menu_action.dart';
 import 'package:book_by_book/services/auth/auth_service.dart';
 import 'package:book_by_book/services/crud/book_services.dart';
+import 'package:book_by_book/utilities/dialogs/logout_dialog.dart';
+import 'package:book_by_book/views/books/books_list_view.dart';
 import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {
@@ -75,20 +77,12 @@ class _MainPageState extends State<MainPage> {
                     case ConnectionState.active:
                      if (snapshot.hasData) {
                       final allBooks =snapshot.data as List<DatabaseBook>;
-                      return ListView.builder(
-                        itemCount: allBooks.length,
-                        itemBuilder: (context, index) {
-                          final book = allBooks[index];
-                          return ListTile(
-                            title: Text(
-                              book.bookTitle,
-                              maxLines: 1,
-                              softWrap: true,
-                              overflow: TextOverflow.ellipsis,
-                              ),
-                          );
+                      return BooksListView(
+                        books: allBooks, 
+                        onDeleteBook: (book) async {
+                          await _booksService.deleteBook(id: book.id);
                         },
-                      );
+                        );
                      } else {
                       return const Text('Waiting for all books');
                      }
@@ -110,30 +104,3 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
-
-Future<bool> showLogOutDialog(BuildContext context) {
-  return showDialog<bool>(
-    context: context, 
-    builder: (context) {
-      return AlertDialog(
-        title: const Text("Log out"),
-        content: const Text("Are you sure you want to log out?"),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false);
-            },
-            child: const Text("Cancel"),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(true);
-            },
-            child: const Text("Log out"),
-          )
-        ]
-
-      );
-    }
-    ).then((value) => value ?? false);
-}
