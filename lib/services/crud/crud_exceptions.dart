@@ -15,3 +15,5 @@ class CouldNotDeleteBook implements Exception {}
 class CouldNotFindBook implements Exception {}
 
 class CouldNotUpdateBook implements Exception {}
+
+class UserShouldBeSetBeforeReadingBooks implements Exception {}

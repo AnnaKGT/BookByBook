@@ -103,7 +103,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Book'),
+        title: const Text('Book Details'),
 
       ),
       body: FutureBuilder(
@@ -115,7 +115,6 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
               _setupTextControllerListener();
               return Column(
                 children: [
-                  const Text('Add a book'),
                   //TextField(
                   //  controller: _textControllerAuthor,
                   //  decoration: const InputDecoration(

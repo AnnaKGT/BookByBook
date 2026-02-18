@@ -1,17 +1,19 @@
 
 import 'dart:async';
 
+import 'package:book_by_book/extensions/list/filter.dart';
 import 'package:book_by_book/services/crud/crud_exceptions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart'show join;
+import 'package:book_by_book/extensions/list/filter.dart';
 
 
 class BooksService {
   Database? _db;
-
   List<DatabaseBook> _books = [];
+  DatabaseUser? _user;
 
   static final BooksService _shared = BooksService._sharedInstance();
   BooksService._sharedInstance() {
@@ -25,14 +27,31 @@ class BooksService {
 
   late final StreamController<List<DatabaseBook>> _booksStreamConroller;
 
-  Stream<List<DatabaseBook>> get allBooks => _booksStreamConroller.stream;
+  Stream<List<DatabaseBook>> get allBooks => 
+  _booksStreamConroller.stream.filter((book) {
+    final currentUser = _user;
+    if (currentUser != null) {
+      return book.userId == currentUser.id;
+    } else {
+      throw UserShouldBeSetBeforeReadingBooks();
+    }
+  });
 
-  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+  Future<DatabaseUser> getOrCreateUser({
+    required String email,
+    bool setAsCurrentUser = true,
+    }) async {
    try {
     final user = await getUser(email: email);
+    if (setAsCurrentUser) {
+      _user = user;
+    }
     return user;
    } on CouldNotFindUser {
     final createdUser = await createUser(email: email);
+    if (setAsCurrentUser) {
+      _user = createdUser;
+    }
     return createdUser;
    } catch (e) {
     rethrow;
