@@ -2,4 +2,4 @@ const loginRoute = '/login/';
 const registerRoute = '/register/';
 const mainPageRoute = '/mainpage/';
 const verifyEmailRoute = '/verify-email/';
-const newBookRoute = '/books/new-book/';
+const createUpdateBookRoute = '/books/new-book/';

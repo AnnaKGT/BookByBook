@@ -32,7 +32,7 @@ class _MainPageState extends State<MainPage> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.of(context).pushNamed(newBookRoute);
+              Navigator.of(context).pushNamed(createUpdateBookRoute);
             }, 
             icon: const Icon(Icons.add),
             ),
@@ -81,6 +81,12 @@ class _MainPageState extends State<MainPage> {
                         books: allBooks, 
                         onDeleteBook: (book) async {
                           await _booksService.deleteBook(id: book.id);
+                        },
+                        onTap: (book) {
+                          Navigator.of(context).pushNamed(
+                            createUpdateBookRoute,
+                            arguments: book,
+                            );
                         },
                         );
                      } else {

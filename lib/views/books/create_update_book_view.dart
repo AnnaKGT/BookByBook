@@ -1,17 +1,18 @@
 import 'package:book_by_book/services/auth/auth_service.dart';
 import 'package:book_by_book/services/crud/book_services.dart';
+import 'package:book_by_book/utilities/generics/get_argumants.dart';
 import 'package:flutter/material.dart';
 
-class NewBookView extends StatefulWidget {
-  const NewBookView({super.key});
+class CreateUpdateBookView extends StatefulWidget {
+  const CreateUpdateBookView({super.key});
 
   @override
-  State<NewBookView> createState() => _NewBookViewState();
+  State<CreateUpdateBookView> createState() => _CreateUpdateBookViewState();
 }
 
 
 
-class _NewBookViewState extends State<NewBookView> {
+class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
 
   DatabaseBook? _book;
   late final BooksService _booksService;
@@ -49,7 +50,16 @@ class _NewBookViewState extends State<NewBookView> {
   }
 
 
-  Future<DatabaseBook> createNewBook() async {
+  Future<DatabaseBook> createOrGetExistingBook(BuildContext context) async {
+
+    final widgetBook = context.getArgument<DatabaseBook>();
+
+    if (widgetBook != null) {
+      _book = widgetBook;
+      _textControllerTitle.text = widgetBook.bookTitle;
+      return widgetBook;
+    }
+
     final existingBook = _book;
     if (existingBook != null) {
       return existingBook;
@@ -58,8 +68,9 @@ class _NewBookViewState extends State<NewBookView> {
     final currentUser = AuthService.firebase().currentUser!;
     final email = currentUser.email!;
     final owner = await _booksService.getUser(email: email);
-
-    return await _booksService.createBook(owner: owner);
+    final newBook = await _booksService.createBook(owner: owner);
+    _book = newBook;
+    return newBook;
   }
 
   void _deleteBookIfTitleIsEmpty() {
@@ -96,13 +107,11 @@ class _NewBookViewState extends State<NewBookView> {
 
       ),
       body: FutureBuilder(
-        future: createNewBook(), 
+        future: createOrGetExistingBook(context), 
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             
             case ConnectionState.done:
-              // ignore: unnecessary_cast
-              _book = snapshot.data as DatabaseBook?;
               _setupTextControllerListener();
               return Column(
                 children: [
