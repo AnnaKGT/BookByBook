@@ -18,21 +18,15 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     _booksService = BooksService();
-    _booksService.open();
+    //_booksService.open();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _booksService.close();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Books'),
+        title: const Text('Your Books'),
         actions: [
           IconButton(
             onPressed: () {
@@ -79,7 +73,26 @@ class _MainPageState extends State<MainPage> {
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.active:
-                      return const Text('Here all your books');
+                     if (snapshot.hasData) {
+                      final allBooks =snapshot.data as List<DatabaseBook>;
+                      return ListView.builder(
+                        itemCount: allBooks.length,
+                        itemBuilder: (context, index) {
+                          final book = allBooks[index];
+                          return ListTile(
+                            title: Text(
+                              book.bookTitle,
+                              maxLines: 1,
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                              ),
+                          );
+                        },
+                      );
+                     } else {
+                      return const Text('Waiting for all books');
+                     }
+                    
                     case ConnectionState.waiting:
                       return const Text('Waiting for all books');
                     default:

@@ -15,37 +15,38 @@ class _NewBookViewState extends State<NewBookView> {
 
   DatabaseBook? _book;
   late final BooksService _booksService;
-  late final TextEditingController _textControllerAuthor;
+  //late final TextEditingController _textControllerAuthor;
   late final TextEditingController _textControllerTitle;
 
   @override
   void initState() {
     _booksService = BooksService();
-    _textControllerAuthor = TextEditingController();
+    //_textControllerAuthor = TextEditingController();
     _textControllerTitle = TextEditingController();
     super.initState();
   }
 
-  void _textControllerLisener() async {
+  void _textControllerListener() async {
     final book = _book;
     if (book == null) {
       return;
     }
 
-    final textAuthor = _textControllerAuthor.text;
+    //final textAuthor = _textControllerAuthor.text;
     final textTitle = _textControllerTitle.text;
     await _booksService.updateBook(
       book: book, 
-      bookAuthor: textAuthor, 
+      //bookAuthor: textAuthor, 
       bookTitle: textTitle,
       );
+    print(book);
   }
 
   void _setupTextControllerListener() {
-    _textControllerAuthor.removeListener(_textControllerLisener);
-    _textControllerAuthor.addListener(_textControllerLisener);
-     _textControllerTitle.removeListener(_textControllerLisener);
-    _textControllerTitle.addListener(_textControllerLisener);
+    //_textControllerAuthor.removeListener(_textControllerListener);
+    //_textControllerAuthor.addListener(_textControllerListener);
+    _textControllerTitle.removeListener(_textControllerListener);
+    _textControllerTitle.addListener(_textControllerListener);
   }
 
 
@@ -72,18 +73,18 @@ class _NewBookViewState extends State<NewBookView> {
   void _saveBookIfTitleIsNotEmpty() async {
     final book = _book;
     final textTitle = _textControllerTitle.text;
-    final textAuthor = _textControllerAuthor.text;
+    //final textAuthor = _textControllerAuthor.text;
     if (textTitle.isNotEmpty && book != null) {
-      await _booksService.updateBook(book: book, bookAuthor: textAuthor, bookTitle: textTitle);
+      await _booksService.updateBook(book: book, bookTitle: textTitle);
     }
   }
 
  
   @override
-  void dispose() {
+  void dispose() async {
     _deleteBookIfTitleIsEmpty();
     _saveBookIfTitleIsNotEmpty();
-    _textControllerAuthor.dispose();
+    //_textControllerAuthor.dispose();
     _textControllerTitle.dispose();
     super.dispose();
   }
@@ -101,18 +102,19 @@ class _NewBookViewState extends State<NewBookView> {
           switch (snapshot.connectionState) {
             
             case ConnectionState.done:
+              // ignore: unnecessary_cast
               _book = snapshot.data as DatabaseBook?;
               _setupTextControllerListener();
               return Column(
                 children: [
                   const Text('Add a book'),
-                  TextField(
-                    controller: _textControllerAuthor,
-                    decoration: const InputDecoration(
-                      hintText: 'Book author'
-                    ),
+                  //TextField(
+                  //  controller: _textControllerAuthor,
+                  //  decoration: const InputDecoration(
+                  //    hintText: 'Book author'
+                  // ),
                     
-                  ),
+                  //),
                   TextField(
                     controller: _textControllerTitle,
                     keyboardType: TextInputType.multiline,

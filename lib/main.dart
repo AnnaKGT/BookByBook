@@ -13,7 +13,7 @@ void main() {
   runApp(MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(       
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: const HomePage(),
       routes: {

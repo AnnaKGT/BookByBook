@@ -14,10 +14,16 @@ class BooksService {
   List<DatabaseBook> _books = [];
 
   static final BooksService _shared = BooksService._sharedInstance();
-  BooksService._sharedInstance();
+  BooksService._sharedInstance() {
+    _booksStreamConroller = StreamController<List<DatabaseBook>>.broadcast(
+      onListen: () {
+        _booksStreamConroller.sink.add(_books);
+      }
+    );
+  }
   factory BooksService() => _shared;
 
-  final _booksStreamConroller = StreamController<List<DatabaseBook>>.broadcast();
+  late final StreamController<List<DatabaseBook>> _booksStreamConroller;
 
   Stream<List<DatabaseBook>> get allBooks => _booksStreamConroller.stream;
 
@@ -42,7 +48,7 @@ class BooksService {
   Future<DatabaseBook> updateBook({
     
     required DatabaseBook book,
-    required String bookAuthor,
+    //required String bookAuthor,
     required String bookTitle,
     }) async {
     await _ensureDbIsOpen();
@@ -52,10 +58,12 @@ class BooksService {
 
     // update DB
     final updatesCount = await db.update(bookTable, {
-      bookAuthor: bookAuthor,
-      bookTitle: bookTitle,
+      //bookAuthor: bookAuthor,
+      bookTitleColumn: bookTitle,
       isSyncedWithCloudColumn: 0,
-    }
+    },
+      where: 'id = ?',
+      whereArgs: [book.id],
     );
 
     if (updatesCount == 0) {
@@ -138,12 +146,12 @@ class BooksService {
     }
 
     const bookTitle = ' ';
-    const bookAuthor = ' ';
+    //const bookAuthor = ' ';
 
     // create the book
     final bookId = await db.insert(bookTable, {
       userIdColumn: owner.id,
-      bookAuthorColumn: bookAuthor,
+      //bookAuthorColumn: bookAuthor,
       bookTitleColumn: bookTitle,
       isSyncedWithCloudColumn: 1,
     });
@@ -151,7 +159,7 @@ class BooksService {
     final book = DatabaseBook(
       id: bookId, 
       userId: owner.id, 
-      bookAuthor: bookAuthor, 
+      //bookAuthor: bookAuthor, 
       bookTitle: bookTitle, 
       isSyncedWithCloud: true);
 
@@ -298,13 +306,13 @@ class DatabaseBook {
   final int id;
   final int userId;
   final String bookTitle;
-  final String bookAuthor;
+  //final String bookAuthor;
   final bool isSyncedWithCloud;
 
   const DatabaseBook({
     required this.id,
     required this.userId,
-    required this.bookAuthor,
+    //required this.bookAuthor,
     required this.bookTitle,
     required this.isSyncedWithCloud,
   });
@@ -313,13 +321,13 @@ class DatabaseBook {
   DatabaseBook.fromRow(Map<String, Object?> map) 
   : id = map[idColumn] as int, 
     userId = map[userIdColumn] as int,
-    bookAuthor = map[bookAuthorColumn] as String,
+    //bookAuthor = map[bookAuthorColumn] as String,
     bookTitle = map[bookTitleColumn] as String,
     isSyncedWithCloud = (map[isSyncedWithCloudColumn] as int) == 1 ? true : false;
 
  @override
   String toString() => 
-    'Book, ID = $id, userId = $userId, bookTitle = $bookTitle, bookAuthor = $bookAuthor, isSyncedWithCould = $isSyncedWithCloud';
+    'Book, ID = $id, userId = $userId, bookTitle = $bookTitle, isSyncedWithCould = $isSyncedWithCloud';
 
   @override
   bool operator ==(covariant DatabaseBook other) => id == other.id;
@@ -335,7 +343,7 @@ const userTable = 'user';
 const idColumn = 'id';
 const emailColumn = 'email';
 const userIdColumn = 'user_id';
-const bookAuthorColumn = 'book_author';
+//const bookAuthorColumn = 'book_author';
 const bookTitleColumn = 'book_title';
 const isSyncedWithCloudColumn = 'is_synced_with_cloud';
 const createUserTable = '''CREATE TABLE IF NOT EXISTS "user" (
@@ -343,12 +351,12 @@ const createUserTable = '''CREATE TABLE IF NOT EXISTS "user" (
   "email"	TEXT NOT NULL UNIQUE,
   PRIMARY KEY("id" AUTOINCREMENT)
 );''';
-const createBookTable = '''CREATE TABLE IF NOT EXISTS "books" (
+const createBookTable = '''CREATE TABLE IF NOT EXISTS "book" (
   "id"	INTEGER NOT NULL,
   "user_id"	INTEGER NOT NULL,
   "book_title"	TEXT,
-  "book_author"	TEXT,
-  "is_synced_with cloud"	INTEGER DEFAULT 0,
+  "book_author"	TEXT ,
+  "is_synced_with_cloud"	INTEGER DEFAULT 0,
   PRIMARY KEY("id" AUTOINCREMENT),
   FOREIGN KEY("user_id") REFERENCES "user"("id")
 );''';
