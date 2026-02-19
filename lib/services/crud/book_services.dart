@@ -7,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart'show join;
-import 'package:book_by_book/extensions/list/filter.dart';
 
 
 class BooksService {

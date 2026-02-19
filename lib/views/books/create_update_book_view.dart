@@ -66,7 +66,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     }
 
     final currentUser = AuthService.firebase().currentUser!;
-    final email = currentUser.email!;
+    final email = currentUser.email;
     final owner = await _booksService.getUser(email: email);
     final newBook = await _booksService.createBook(owner: owner);
     _book = newBook;
