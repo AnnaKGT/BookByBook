@@ -1,9 +1,10 @@
 import 'package:book_by_book/services/auth/auth_service.dart';
 import 'package:book_by_book/services/cloud/cloud_book.dart';
 import 'package:book_by_book/services/cloud/firebase_cloud_storage.dart';
+import 'package:book_by_book/utilities/dialogs/cannot_share_empty_book_dialog.dart';
 import 'package:book_by_book/utilities/generics/get_argumants.dart';
 import 'package:flutter/material.dart';
-
+import 'package:share_plus/share_plus.dart';
 
 
 class CreateUpdateBookView extends StatefulWidget {
@@ -95,7 +96,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
 
  
   @override
-  void dispose() async {
+  void dispose() {
     _deleteBookIfTitleIsEmpty();
     _saveBookIfTitleIsNotEmpty();
     //_textControllerAuthor.dispose();
@@ -108,6 +109,19 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Book Details'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final text = _textControllerTitle.text;
+              if (_book == null || text.isEmpty) {
+                await showCannotShareEmptyBookDialog(context);
+              } else {
+               await SharePlus.instance.share(ShareParams(text: text));
+              }
+            },
+            icon: const Icon(Icons.share),
+            ),
+        ],
 
       ),
       body: FutureBuilder(
