@@ -1,7 +1,10 @@
 import 'package:book_by_book/services/auth/auth_service.dart';
-import 'package:book_by_book/services/crud/book_services.dart';
+import 'package:book_by_book/services/cloud/cloud_book.dart';
+import 'package:book_by_book/services/cloud/firebase_cloud_storage.dart';
 import 'package:book_by_book/utilities/generics/get_argumants.dart';
 import 'package:flutter/material.dart';
+
+
 
 class CreateUpdateBookView extends StatefulWidget {
   const CreateUpdateBookView({super.key});
@@ -14,14 +17,14 @@ class CreateUpdateBookView extends StatefulWidget {
 
 class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
 
-  DatabaseBook? _book;
-  late final BooksService _booksService;
+  CloudBook? _book;
+  late final FirebaseCloudStorage _booksService;
   //late final TextEditingController _textControllerAuthor;
   late final TextEditingController _textControllerTitle;
 
   @override
   void initState() {
-    _booksService = BooksService();
+    _booksService = FirebaseCloudStorage();
     //_textControllerAuthor = TextEditingController();
     _textControllerTitle = TextEditingController();
     super.initState();
@@ -36,8 +39,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     //final textAuthor = _textControllerAuthor.text;
     final textTitle = _textControllerTitle.text;
     await _booksService.updateBook(
-      book: book, 
-      //bookAuthor: textAuthor, 
+      documentId: book.documentId, 
       bookTitle: textTitle,
       );
   }
@@ -50,9 +52,9 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   }
 
 
-  Future<DatabaseBook> createOrGetExistingBook(BuildContext context) async {
+  Future<CloudBook> createOrGetExistingBook(BuildContext context) async {
 
-    final widgetBook = context.getArgument<DatabaseBook>();
+    final widgetBook = context.getArgument<CloudBook>();
 
     if (widgetBook != null) {
       _book = widgetBook;
@@ -66,9 +68,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     }
 
     final currentUser = AuthService.firebase().currentUser!;
-    final email = currentUser.email;
-    final owner = await _booksService.getUser(email: email);
-    final newBook = await _booksService.createBook(owner: owner);
+    final userId = currentUser.id;
+    final newBook = await _booksService.createNewBook(ownerUserId: userId);
     _book = newBook;
     return newBook;
   }
@@ -76,7 +77,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   void _deleteBookIfTitleIsEmpty() {
     final book = _book;
     if (_textControllerTitle.text.isEmpty && book != null) {
-      _booksService.deleteBook(id: book.id);
+      _booksService.deleteBook(documentId: book.documentId);
     }
   }
 
@@ -85,7 +86,10 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     final textTitle = _textControllerTitle.text;
     //final textAuthor = _textControllerAuthor.text;
     if (textTitle.isNotEmpty && book != null) {
-      await _booksService.updateBook(book: book, bookTitle: textTitle);
+      await _booksService.updateBook(
+        documentId: book.documentId, 
+        bookTitle: textTitle,
+        );
     }
   }
 

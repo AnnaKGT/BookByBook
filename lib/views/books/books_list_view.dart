@@ -1,11 +1,12 @@
-import 'package:book_by_book/services/crud/book_services.dart';
+
 import 'package:book_by_book/utilities/dialogs/delete_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:book_by_book/services/cloud/cloud_book.dart';
 
-typedef BookCallback = void Function(DatabaseBook book);
+typedef BookCallback = void Function(CloudBook book);
 
 class BooksListView extends StatelessWidget {
-  final List<DatabaseBook> books;
+  final Iterable<CloudBook> books;
   final BookCallback onDeleteBook;
   final BookCallback onTap;
 
@@ -21,7 +22,7 @@ class BooksListView extends StatelessWidget {
     return ListView.builder(
       itemCount: books.length,
       itemBuilder: (context, index) {
-      final book = books[index];
+      final book = books.elementAt(index);
       return ListTile(
         onTap: () {
           onTap(book);

@@ -43,29 +43,27 @@ class FirebaseCloudStorage {
         isEqualTo: ownerUserId,
       )
       .get()
-      .then((value) => value.docs.map((doc) {
-        return CloudBook(
-          documentId: doc.id, 
-          ownerUserId: doc.data()[ownerUserIdFieldName] as String, 
-          bookTitle: doc.data()[bookTitleFieldName] as String,
-          );
-      }));
+      .then((value) => value.docs.map((doc) => CloudBook.fromSnapshot(doc)));
     } catch (e) {
       throw CouldNotGetAllBookException();
     }
   }
 
-  void createNewBook({required String ownerUserId}) async {
-    await books.add({
+  Future<CloudBook> createNewBook({required String ownerUserId}) async {
+    final document = books.add({
       ownerUserIdFieldName: ownerUserId,
       bookTitleFieldName: '',
     });
+    final fetchedBook = await document;
+    return CloudBook(
+      documentId: fetchedBook.id, 
+      ownerUserId: ownerUserId, 
+      bookTitle: '',
+      );
   }
 
   // creating singleton
   static final FirebaseCloudStorage _shared = FirebaseCloudStorage._sharedInstance();
   FirebaseCloudStorage._sharedInstance();
   factory FirebaseCloudStorage() => _shared;
-
-
 }
