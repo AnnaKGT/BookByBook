@@ -1,11 +1,14 @@
 import 'package:book_by_book/constants/routes.dart';
 import 'package:book_by_book/enums/menu_action.dart';
 import 'package:book_by_book/services/auth/auth_service.dart';
+import 'package:book_by_book/services/auth/bloc/auth_bloc.dart';
+import 'package:book_by_book/services/auth/bloc/auth_event.dart';
 import 'package:book_by_book/services/cloud/cloud_book.dart';
 import 'package:book_by_book/services/cloud/firebase_cloud_storage.dart';
 import 'package:book_by_book/utilities/dialogs/logout_dialog.dart';
 import 'package:book_by_book/views/books/books_list_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -29,7 +32,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Books'),
+        title: Text('Your Books'),
         actions: [
           IconButton(
             onPressed: () {
@@ -42,13 +45,9 @@ class _MainPageState extends State<MainPage> {
               switch (value) {
                 case MenuAction.logout:
                   final shouldLogout = await showLogOutDialog(context);
-                  if (shouldLogout) {                   
-                    await AuthService.firebase().logOut();
-                    if (!context.mounted) return;
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      loginRoute, 
-                      (_) => false,
-                      );
+                  if (shouldLogout) {   
+                    if (!context.mounted) return;                
+                    context.read<AuthBloc>().add(const AuthEventLogOut(),);
                   }
                   break;
                 

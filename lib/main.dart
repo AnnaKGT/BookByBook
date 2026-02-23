@@ -1,21 +1,29 @@
 
 import 'package:book_by_book/constants/routes.dart';
-import 'package:book_by_book/services/auth/auth_service.dart';
+import 'package:book_by_book/services/auth/bloc/auth_bloc.dart';
+import 'package:book_by_book/services/auth/bloc/auth_event.dart';
+import 'package:book_by_book/services/auth/bloc/auth_state.dart';
+import 'package:book_by_book/services/auth/firebase_auth_provider.dart';
 import 'package:book_by_book/views/books/create_update_book_view.dart';
 import 'package:book_by_book/views/login_view.dart';
 import 'package:book_by_book/views/books/books_view.dart';
 import 'package:book_by_book/views/register_view.dart';
 import 'package:book_by_book/views/verify_email.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MaterialApp(
+  runApp(
+    MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(       
+      theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const HomePage(),
+      home: BlocProvider<AuthBloc>(
+        create: (context) => AuthBloc(FirebaseAuthProvider()),
+        child: const HomePage(),
+      ),
       routes: {
         loginRoute: (context) => const LoginView(),
         registerRoute: (context) => const RegisterView(),
@@ -23,7 +31,8 @@ void main() {
         verifyEmailRoute: (context) => const VerifyEmailView(),
         createUpdateBookRoute: (context) => const CreateUpdateBookView(),
       },
-    ),);
+    ),
+  );
 }
 
 class HomePage extends StatelessWidget {
@@ -31,28 +40,20 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: AuthService.firebase().initialize(),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              final user = AuthService.firebase().currentUser;
-              if (user != null) {
-                if (user.isEmailVerified) {
-                  return const MainPage();
-                } else {
-                  return const VerifyEmailView();
-                }
-              } else {
-                return const LoginView();
-              }
-
-              
-          default:
-          return const CircularProgressIndicator();      
-          }         
-        },        
-      );   
+    context.read<AuthBloc>().add(const AuthEventInitialize());
+    return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+      if (state is AuthEventLogIn) {
+        return const MainPage();
+      } else if (state is AuthStateNeedsVerification) {
+        return const VerifyEmailView();
+      } else if (state is AuthEventLogOut) {
+        return const LoginView();
+      } else {
+        return const Scaffold(
+          body: CircularProgressIndicator()
+        );
+      }
+    },
+    );
   }
 }
-
