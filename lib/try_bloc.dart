@@ -40,8 +40,8 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Text('Current value => ${state.value}'),
                 Visibility(
-                  child: Text('Invalid input: $invalidValue'),
                   visible: state is CounterStateInvalidNumber,
+                  child: Text('Invalid input: $invalidValue'),
                   ),
                 TextField(
                   controller: _controller,
@@ -89,7 +89,7 @@ abstract class CounterState {
 }
 
 class CounterStateValid extends CounterState {
-  const CounterStateValid(int value) : super(value);
+  const CounterStateValid(super.value);
 }
 
 class CounterStateInvalidNumber extends CounterState {
@@ -107,11 +107,11 @@ abstract class CounterEvent {
 }
 
 class IncrementEvent extends CounterEvent {
-  const IncrementEvent(String value) : super(value);
+  const IncrementEvent(super.value);
 }
 
 class DecrementEvent extends CounterEvent {
-  const DecrementEvent (String value) : super(value);
+  const DecrementEvent (super.value);
 }
 
 class CounterBloc extends Bloc<CounterEvent, CounterState> {
