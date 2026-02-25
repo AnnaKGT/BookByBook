@@ -2,10 +2,12 @@ import 'package:book_by_book/services/auth/auth_service.dart';
 import 'package:book_by_book/services/cloud/cloud_book.dart';
 import 'package:book_by_book/services/cloud/firebase_cloud_storage.dart';
 import 'package:book_by_book/utilities/dialogs/cannot_share_empty_book_dialog.dart';
+import 'package:book_by_book/utilities/dialogs/delete_dialog.dart';
 import 'package:book_by_book/utilities/generics/get_argumants.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
+typedef BookCallback = void Function(CloudBook book);
 
 class CreateUpdateBookView extends StatefulWidget {
   const CreateUpdateBookView({super.key});
@@ -121,6 +123,18 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
             },
             icon: const Icon(Icons.share),
             ),
+          IconButton(
+            onPressed: () async {
+              final shouldDelete = await showDeleteDialog(context);
+              if (shouldDelete) {
+               final book = _book;
+               if (book != null) {
+                await _booksService.deleteBook(documentId: book.documentId);
+                if (context.mounted) Navigator.of(context).pop();
+              }
+            }
+            }, 
+            icon: const Icon(Icons.delete)),
         ],
 
       ),

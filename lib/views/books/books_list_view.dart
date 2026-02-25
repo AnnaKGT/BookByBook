@@ -1,5 +1,4 @@
 
-import 'package:book_by_book/utilities/dialogs/delete_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:book_by_book/services/cloud/cloud_book.dart';
 
@@ -33,15 +32,15 @@ class BooksListView extends StatelessWidget {
           softWrap: true,
           overflow: TextOverflow.ellipsis,
           ),
-        trailing: IconButton(
-          onPressed: () async {
-            final shouldDelete = await showDeleteDialog(context);
-            if (shouldDelete) {
-              onDeleteBook(book);
-            }
-          },
-          icon: const Icon(Icons.delete),
-        ),
+        // trailing: IconButton(
+        //   onPressed: () async {
+        //     final shouldDelete = await showDeleteDialog(context);
+        //     if (shouldDelete) {
+        //       onDeleteBook(book);
+        //     }
+        //   },
+        //   icon: const Icon(Icons.delete),
+        // ),
         );
       },
    );
