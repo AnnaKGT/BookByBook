@@ -20,10 +20,12 @@ class FirebaseCloudStorage {
   Future<void> updateBook({
     required String documentId,
     required String bookTitle,
+    required String bookAuthor,
   }) async {
     try {
       await books.doc(documentId).update({
         bookTitleFieldName: bookTitle,
+        bookAuthorFieldName: bookAuthor,
       });
     } catch (e) {
       throw CouldNotUpdateBookException();
@@ -50,16 +52,23 @@ class FirebaseCloudStorage {
   }
 
   Future<CloudBook> createNewBook({required String ownerUserId}) async {
-    final document = books.add({
+    try {
+      final document = books.add({
       ownerUserIdFieldName: ownerUserId,
       bookTitleFieldName: '',
+      bookAuthorFieldName: '',
     });
     final fetchedBook = await document;
     return CloudBook(
       documentId: fetchedBook.id, 
       ownerUserId: ownerUserId, 
       bookTitle: '',
+      bookAuthor: '',
       );
+    } catch (e) {
+      throw CouldNotCreateBookException();
+    }
+    
   }
 
   // creating singleton

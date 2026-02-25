@@ -22,16 +22,23 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
 
   CloudBook? _book;
   late final FirebaseCloudStorage _booksService;
-  //late final TextEditingController _textControllerAuthor;
+  late final TextEditingController _textControllerAuthor;
   late final TextEditingController _textControllerTitle;
+  late Future<CloudBook> _bookFuture;
 
   @override
   void initState() {
     _booksService = FirebaseCloudStorage();
-    //_textControllerAuthor = TextEditingController();
+    _textControllerAuthor = TextEditingController();
     _textControllerTitle = TextEditingController();
     super.initState();
   }
+
+  @override
+  void didChangeDependencies() {
+  super.didChangeDependencies();
+  _bookFuture = createOrGetExistingBook(context); // cache it here
+}
 
   void _textControllerListener() async {
     final book = _book;
@@ -39,17 +46,18 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
       return;
     }
 
-    //final textAuthor = _textControllerAuthor.text;
+    final textAuthor = _textControllerAuthor.text;
     final textTitle = _textControllerTitle.text;
     await _booksService.updateBook(
       documentId: book.documentId, 
       bookTitle: textTitle,
+      bookAuthor: textAuthor,
       );
   }
 
   void _setupTextControllerListener() {
-    //_textControllerAuthor.removeListener(_textControllerListener);
-    //_textControllerAuthor.addListener(_textControllerListener);
+    _textControllerAuthor.removeListener(_textControllerListener);
+    _textControllerAuthor.addListener(_textControllerListener);
     _textControllerTitle.removeListener(_textControllerListener);
     _textControllerTitle.addListener(_textControllerListener);
   }
@@ -62,6 +70,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     if (widgetBook != null) {
       _book = widgetBook;
       _textControllerTitle.text = widgetBook.bookTitle;
+      _textControllerAuthor.text = widgetBook.bookAuthor;
       return widgetBook;
     }
 
@@ -87,11 +96,12 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   void _saveBookIfTitleIsNotEmpty() async {
     final book = _book;
     final textTitle = _textControllerTitle.text;
-    //final textAuthor = _textControllerAuthor.text;
+    final textAuthor = _textControllerAuthor.text;
     if (textTitle.isNotEmpty && book != null) {
       await _booksService.updateBook(
         documentId: book.documentId, 
         bookTitle: textTitle,
+        bookAuthor: textAuthor,
         );
     }
   }
@@ -101,10 +111,11 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   void dispose() {
     _deleteBookIfTitleIsEmpty();
     _saveBookIfTitleIsNotEmpty();
-    //_textControllerAuthor.dispose();
+    _textControllerAuthor.dispose();
     _textControllerTitle.dispose();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -139,30 +150,33 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
 
       ),
       body: FutureBuilder(
-        future: createOrGetExistingBook(context), 
+        future: _bookFuture, 
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             
             case ConnectionState.done:
               _setupTextControllerListener();
-              return Column(
-                children: [
-                  //TextField(
-                  //  controller: _textControllerAuthor,
-                  //  decoration: const InputDecoration(
-                  //    hintText: 'Book author'
-                  // ),
-                    
-                  //),
-                  TextField(
-                    controller: _textControllerTitle,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      hintText: 'Book title'
-                    )
-                  ),
-                ],
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    TextField(
+                     controller: _textControllerAuthor,
+                     decoration: const InputDecoration(
+                       hintText: 'Book author'
+                    ),
+                      
+                    ),
+                    TextField(
+                      controller: _textControllerTitle,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        hintText: 'Book title'
+                      )
+                    ),
+                  ],
+                ),
               );
              
             default:

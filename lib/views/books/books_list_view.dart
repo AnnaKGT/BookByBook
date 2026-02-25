@@ -26,12 +26,24 @@ class BooksListView extends StatelessWidget {
         onTap: () {
           onTap(book);
         },
-        title: Text(
-          book.bookTitle,
-          maxLines: 1,
-          softWrap: true,
-          overflow: TextOverflow.ellipsis,
-          ),
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              book.bookAuthor,
+              maxLines: 1,
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+              ),
+            const Text(' — '),
+            Text(
+              book.bookTitle,
+              maxLines: 1,
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+              ),
+          ],
+        ),
         // trailing: IconButton(
         //   onPressed: () async {
         //     final shouldDelete = await showDeleteDialog(context);
