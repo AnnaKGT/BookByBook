@@ -5,6 +5,7 @@ import 'package:book_by_book/services/auth/bloc/auth_event.dart';
 import 'package:book_by_book/services/auth/bloc/auth_state.dart';
 import 'package:book_by_book/services/auth/firebase_auth_provider.dart';
 import 'package:book_by_book/views/books/create_update_book_view.dart';
+import 'package:book_by_book/views/forgot_password_view.dart';
 import 'package:book_by_book/views/login_view.dart';
 import 'package:book_by_book/views/books/books_view.dart';
 import 'package:book_by_book/views/register_view.dart';
@@ -56,6 +57,8 @@ class HomePage extends StatelessWidget {
         return const VerifyEmailView();
       } else if (state is AuthStateLoggedOut) {
         return const LoginView();
+      } else if (state is AuthStateForgotPassword) {
+        return const ForgotPasswordView();
       } else if (state is AuthStateRegistering) {
         return const RegisterView();
       } else {
