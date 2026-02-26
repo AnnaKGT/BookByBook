@@ -25,7 +25,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   late final TextEditingController _textControllerAuthor;
   late final TextEditingController _textControllerTitle;
   late final TextEditingController _textControllerNotes;
-  late final TextEditingController _textControllerRating;
+  late final double _doubleControllerRating;
   late Future<CloudBook> _bookFuture;
 
   @override
@@ -34,7 +34,6 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     _textControllerAuthor = TextEditingController();
     _textControllerTitle = TextEditingController();
     _textControllerNotes = TextEditingController();
-    _textControllerRating = TextEditingController();
     super.initState();
   }
 
@@ -57,7 +56,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
       bookTitle: textTitle,
       bookAuthor: textAuthor, 
       bookNotes: '', 
-      bookRating: null,
+      bookRating: 0.0,
       );
   }
 
@@ -68,8 +67,6 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     _textControllerTitle.addListener(_textControllerListener);
     _textControllerNotes.removeListener(_textControllerListener);
     _textControllerNotes.addListener(_textControllerListener);
-    _textControllerRating.removeListener(_textControllerListener);
-    _textControllerRating.addListener(_textControllerListener);
   }
 
 
@@ -82,7 +79,6 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
       _textControllerTitle.text = widgetBook.bookTitle;
       _textControllerAuthor.text = widgetBook.bookAuthor;
       _textControllerNotes.text = widgetBook.bookNotes;
-      _textControllerRating.text = widgetBook.bookRating;
       return widgetBook;
     }
 
@@ -109,13 +105,14 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     final book = _book;
     final textTitle = _textControllerTitle.text;
     final textAuthor = _textControllerAuthor.text;
+    final textNotes = _textControllerNotes.text;
     if (textTitle.isNotEmpty && book != null) {
       await _booksService.updateBook(
         documentId: book.documentId, 
         bookTitle: textTitle,
         bookAuthor: textAuthor, 
-        bookNotes: '', 
-        bookRating: null,
+        bookNotes: textNotes, 
+        bookRating: 0.0,
         );
     }
   }
@@ -128,7 +125,6 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     _textControllerAuthor.dispose();
     _textControllerTitle.dispose();
     _textControllerNotes.dispose();
-    _textControllerRating.dispose();
     super.dispose();
   }
 

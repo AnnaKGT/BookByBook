@@ -70,7 +70,7 @@ class FirebaseCloudStorage {
       ownerUserId: ownerUserId, 
       bookTitle: '',
       bookAuthor: '', 
-      bookRating: '', 
+      bookRating: 0.0, 
       bookNotes: '',
       );
     } catch (e) {
