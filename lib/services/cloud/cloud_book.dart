@@ -8,17 +8,23 @@ class CloudBook {
   final String ownerUserId;
   final String bookTitle;
   final String bookAuthor;
+  final String bookRating;
+  final String bookNotes;
 
   const CloudBook({
     required this.documentId,
     required this.ownerUserId,
     required this.bookTitle, 
-    required this.bookAuthor,
+    required this.bookAuthor, 
+    required this.bookRating, 
+    required this.bookNotes,
     });
 
   CloudBook.fromSnapshot(QueryDocumentSnapshot<Map<String, dynamic>> snapshot) : 
    documentId = snapshot.id,
    ownerUserId = snapshot.data()[ownerUserIdFieldName] as String,
    bookTitle = snapshot.data()[bookTitleFieldName] as String? ?? '',
-   bookAuthor = snapshot.data()[bookAuthorFieldName] as String? ?? '';
+   bookNotes = snapshot.data()[bookNotesFieldName] as String? ?? '',
+   bookAuthor = snapshot.data()[bookAuthorFieldName] as String? ?? '',
+   bookRating = snapshot.data()[bookRatingFieldName];
 }

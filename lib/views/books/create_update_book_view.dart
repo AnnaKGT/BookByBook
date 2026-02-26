@@ -24,6 +24,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   late final FirebaseCloudStorage _booksService;
   late final TextEditingController _textControllerAuthor;
   late final TextEditingController _textControllerTitle;
+  late final TextEditingController _textControllerNotes;
+  late final TextEditingController _textControllerRating;
   late Future<CloudBook> _bookFuture;
 
   @override
@@ -31,6 +33,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     _booksService = FirebaseCloudStorage();
     _textControllerAuthor = TextEditingController();
     _textControllerTitle = TextEditingController();
+    _textControllerNotes = TextEditingController();
+    _textControllerRating = TextEditingController();
     super.initState();
   }
 
@@ -51,7 +55,9 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     await _booksService.updateBook(
       documentId: book.documentId, 
       bookTitle: textTitle,
-      bookAuthor: textAuthor,
+      bookAuthor: textAuthor, 
+      bookNotes: '', 
+      bookRating: null,
       );
   }
 
@@ -60,6 +66,10 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     _textControllerAuthor.addListener(_textControllerListener);
     _textControllerTitle.removeListener(_textControllerListener);
     _textControllerTitle.addListener(_textControllerListener);
+    _textControllerNotes.removeListener(_textControllerListener);
+    _textControllerNotes.addListener(_textControllerListener);
+    _textControllerRating.removeListener(_textControllerListener);
+    _textControllerRating.addListener(_textControllerListener);
   }
 
 
@@ -71,6 +81,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
       _book = widgetBook;
       _textControllerTitle.text = widgetBook.bookTitle;
       _textControllerAuthor.text = widgetBook.bookAuthor;
+      _textControllerNotes.text = widgetBook.bookNotes;
+      _textControllerRating.text = widgetBook.bookRating;
       return widgetBook;
     }
 
@@ -101,7 +113,9 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
       await _booksService.updateBook(
         documentId: book.documentId, 
         bookTitle: textTitle,
-        bookAuthor: textAuthor,
+        bookAuthor: textAuthor, 
+        bookNotes: '', 
+        bookRating: null,
         );
     }
   }
@@ -113,6 +127,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     _saveBookIfTitleIsNotEmpty();
     _textControllerAuthor.dispose();
     _textControllerTitle.dispose();
+    _textControllerNotes.dispose();
+    _textControllerRating.dispose();
     super.dispose();
   }
 
@@ -173,6 +189,14 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                       maxLines: null,
                       decoration: const InputDecoration(
                         hintText: 'Book title'
+                      )
+                    ),
+                    TextField(
+                      controller: _textControllerNotes,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        hintText: 'Book notes'
                       )
                     ),
                   ],
