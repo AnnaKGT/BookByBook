@@ -147,7 +147,9 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
         actions: [
           IconButton(
             onPressed: () async {
+
               final text = _textControllerTitle.text;
+
               if (_book == null || text.isEmpty) {
                 await showCannotShareEmptyBookDialog(context);
               } else {

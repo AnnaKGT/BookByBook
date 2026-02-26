@@ -1,4 +1,5 @@
 
+import 'package:book_by_book/helpers/empty_books_view.dart';
 import 'package:flutter/material.dart';
 import 'package:book_by_book/services/cloud/cloud_book.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -19,61 +20,83 @@ class BooksListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: books.length,
-      itemBuilder: (context, index) {
-      final book = books.elementAt(index);
-      return ListTile(
-        onTap: () {
-          onTap(book);
-        },
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    if (books.isEmpty) {
+      return const EmptyBooksView();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Text(
+          '${books.length} ${books.length == 1 ? 'item' : 'items'}',
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey.shade600,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: books.length,
+            itemBuilder: (context, index) {
+            final book = books.elementAt(index);
+            return ListTile(
+              onTap: () {
+                onTap(book);
+              },
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    book.bookAuthor,
-                    maxLines: 1,
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 14, color: Colors.grey)
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          book.bookAuthor,
+                          maxLines: 1,
+                          softWrap: true,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 14, color: Colors.grey)
+                          ),
+                    
+                        Text(
+                          book.bookTitle,
+                          maxLines: 1,
+                          softWrap: true,
+                          overflow: TextOverflow.ellipsis,
+                          ),
+                      ],
                     ),
-              
-                  Text(
-                    book.bookTitle,
-                    maxLines: 1,
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
+                  ),
+                  RatingBarIndicator(
+                    rating: book.bookRating,
+                    itemBuilder: (context, index) => Icon(
+                      Icons.star,
+                      color: Colors.amber,
                     ),
+                    itemCount: 5,
+                    itemSize: 16,
+                    direction: Axis.horizontal,
+                  ),
                 ],
               ),
-            ),
-            RatingBarIndicator(
-              rating: book.bookRating,
-              itemBuilder: (context, index) => Icon(
-                Icons.star,
-                color: Colors.amber,
-              ),
-              itemCount: 5,
-              itemSize: 16,
-              direction: Axis.horizontal,
-            ),
-          ],
+              // trailing: IconButton(
+              //   onPressed: () async {
+              //     final shouldDelete = await showDeleteDialog(context);
+              //     if (shouldDelete) {
+              //       onDeleteBook(book);
+              //     }
+              //   },
+              //   icon: const Icon(Icons.delete),
+              // ),
+              );
+            },
+             ),
         ),
-        // trailing: IconButton(
-        //   onPressed: () async {
-        //     final shouldDelete = await showDeleteDialog(context);
-        //     if (shouldDelete) {
-        //       onDeleteBook(book);
-        //     }
-        //   },
-        //   icon: const Icon(Icons.delete),
-        // ),
-        );
-      },
-   );
+      ],
+    );
   }
 }

@@ -70,7 +70,7 @@ class _MainPageState extends State<MainPage> {
                   switch (snapshot.connectionState) {
                     case ConnectionState.active:
                      if (snapshot.hasData) {
-                      final allBooks =snapshot.data as Iterable<CloudBook>;
+                      final allBooks = snapshot.data as Iterable<CloudBook>;
                       return BooksListView(
                         books: allBooks, 
                         onDeleteBook: (book) async {
@@ -89,6 +89,7 @@ class _MainPageState extends State<MainPage> {
                     
                     case ConnectionState.waiting:
                       return const Text('Waiting for all books');
+
                     default:
                      return const CircularProgressIndicator();
                   }
