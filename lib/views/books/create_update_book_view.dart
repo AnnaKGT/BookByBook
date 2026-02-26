@@ -26,6 +26,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   late final TextEditingController _textControllerAuthor;
   late final TextEditingController _textControllerTitle;
   late final TextEditingController _textControllerNotes;
+  late final TextEditingController _textControllerLink;
   double _currentRating = 0.0;
 
   late Future<CloudBook> _bookFuture;
@@ -36,6 +37,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     _textControllerAuthor = TextEditingController();
     _textControllerTitle = TextEditingController();
     _textControllerNotes = TextEditingController();
+    _textControllerLink = TextEditingController();
     super.initState();
   }
 
@@ -55,7 +57,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
       documentId: book.documentId, 
       bookTitle: _textControllerTitle.text,
       bookAuthor: _textControllerAuthor.text, 
-      bookNotes: _textControllerNotes.text, 
+      bookNotes: _textControllerNotes.text,
+      bookLink: _textControllerLink.text, 
       bookRating: _currentRating,
       );
   }
@@ -67,6 +70,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     _textControllerTitle.addListener(_textControllerListener);
     _textControllerNotes.removeListener(_textControllerListener);
     _textControllerNotes.addListener(_textControllerListener);
+    _textControllerLink.removeListener(_textControllerListener);
+    _textControllerLink.addListener(_textControllerListener);
   }
 
 
@@ -79,6 +84,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
       _textControllerTitle.text = widgetBook.bookTitle;
       _textControllerAuthor.text = widgetBook.bookAuthor;
       _textControllerNotes.text = widgetBook.bookNotes;
+      _textControllerLink.text = widgetBook.bookLink;
       _currentRating = widgetBook.bookRating;
       return widgetBook;
     }
@@ -107,12 +113,14 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     final textTitle = _textControllerTitle.text;
     final textAuthor = _textControllerAuthor.text;
     final textNotes = _textControllerNotes.text;
+    final textLink = _textControllerLink.text;
     if (textTitle.isNotEmpty && book != null) {
       await _booksService.updateBook(
         documentId: book.documentId, 
         bookTitle: textTitle,
         bookAuthor: textAuthor, 
-        bookNotes: textNotes, 
+        bookNotes: textNotes,
+        bookLink: textLink, 
         bookRating: _currentRating,
         );
     }
@@ -126,6 +134,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     _textControllerAuthor.dispose();
     _textControllerTitle.dispose();
     _textControllerNotes.dispose();
+    _textControllerLink.dispose();
     super.dispose();
   }
 
@@ -197,6 +206,16 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                         hintText: ' '
                       )
                     ),
+                    const SizedBox(height: 16,),
+                    const Text(
+                      'Link:',
+                      style: TextStyle(fontSize: 14, color: Colors.grey)),
+                    TextField(
+                      controller: _textControllerLink,
+                      decoration: const InputDecoration(
+                        hintText: ' '
+                      )
+                    ),
 
                     const SizedBox(height: 24,),
                     const Text(
@@ -213,7 +232,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                             documentId: book.documentId, 
                             bookTitle: _textControllerTitle.text, 
                             bookAuthor: _textControllerAuthor.text, 
-                            bookNotes: _textControllerNotes.text, 
+                            bookNotes: _textControllerNotes.text,
+                            bookLink: _textControllerLink.text, 
                             bookRating: rating,
                             );
                         }

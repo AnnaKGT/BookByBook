@@ -22,6 +22,7 @@ class FirebaseCloudStorage {
     required String bookTitle,
     required String bookAuthor,
     required String bookNotes,
+    required String bookLink,
     required double bookRating
   }) async {
     try {
@@ -30,6 +31,7 @@ class FirebaseCloudStorage {
         bookAuthorFieldName: bookAuthor,
         bookRatingFieldName: bookRating,
         bookNotesFieldName: bookNotes,
+        bookLinkFieldName: bookLink,
       });
     } catch (e) {
       throw CouldNotUpdateBookException();
@@ -62,6 +64,7 @@ class FirebaseCloudStorage {
       bookTitleFieldName: '',
       bookAuthorFieldName: '',
       bookNotesFieldName: '',
+      bookLinkFieldName: '',
       bookRatingFieldName: 0.0,
     });
     final fetchedBook = await document;
@@ -72,6 +75,7 @@ class FirebaseCloudStorage {
       bookAuthor: '', 
       bookRating: 0.0, 
       bookNotes: '',
+      bookLink: '',
       );
     } catch (e) {
       throw CouldNotCreateBookException();
