@@ -26,5 +26,5 @@ class CloudBook {
    bookTitle = snapshot.data()[bookTitleFieldName] as String? ?? '',
    bookNotes = snapshot.data()[bookNotesFieldName] as String? ?? '',
    bookAuthor = snapshot.data()[bookAuthorFieldName] as String? ?? '',
-   bookRating = snapshot.data()[bookRatingFieldName];
+   bookRating = (snapshot.data()[bookRatingFieldName] as num?)?.toDouble() ?? 0.0;
 }

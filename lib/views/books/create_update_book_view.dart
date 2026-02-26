@@ -1,3 +1,4 @@
+import 'package:book_by_book/helpers/rating_input_field.dart';
 import 'package:book_by_book/services/auth/auth_service.dart';
 import 'package:book_by_book/services/cloud/cloud_book.dart';
 import 'package:book_by_book/services/cloud/firebase_cloud_storage.dart';
@@ -25,7 +26,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   late final TextEditingController _textControllerAuthor;
   late final TextEditingController _textControllerTitle;
   late final TextEditingController _textControllerNotes;
-  late final double _doubleControllerRating;
+  double _currentRating = 0.0;
+
   late Future<CloudBook> _bookFuture;
 
   @override
@@ -49,14 +51,12 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
       return;
     }
 
-    final textAuthor = _textControllerAuthor.text;
-    final textTitle = _textControllerTitle.text;
     await _booksService.updateBook(
       documentId: book.documentId, 
-      bookTitle: textTitle,
-      bookAuthor: textAuthor, 
-      bookNotes: '', 
-      bookRating: 0.0,
+      bookTitle: _textControllerTitle.text,
+      bookAuthor: _textControllerAuthor.text, 
+      bookNotes: _textControllerNotes.text, 
+      bookRating: _currentRating,
       );
   }
 
@@ -79,6 +79,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
       _textControllerTitle.text = widgetBook.bookTitle;
       _textControllerAuthor.text = widgetBook.bookAuthor;
       _textControllerNotes.text = widgetBook.bookNotes;
+      _currentRating = widgetBook.bookRating;
       return widgetBook;
     }
 
@@ -112,7 +113,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
         bookTitle: textTitle,
         bookAuthor: textAuthor, 
         bookNotes: textNotes, 
-        bookRating: 0.0,
+        bookRating: _currentRating,
         );
     }
   }
@@ -171,28 +172,62 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
               return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    
+                    const Text(
+                      'Author:',
+                      style: TextStyle(fontSize: 14, color: Colors.grey)),
                     TextField(
                      controller: _textControllerAuthor,
                      decoration: const InputDecoration(
-                       hintText: 'Book author'
+                       hintText: ' '
                     ),
                       
                     ),
+                    const SizedBox(height: 16,),
+                    const Text(
+                      'Title:',
+                      style: TextStyle(fontSize: 14, color: Colors.grey)),
                     TextField(
                       controller: _textControllerTitle,
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
                       decoration: const InputDecoration(
-                        hintText: 'Book title'
+                        hintText: ' '
                       )
                     ),
+
+                    const SizedBox(height: 24,),
+                    const Text(
+                      'How do you like the book?',
+                      style: TextStyle(fontSize: 14, color: Colors.grey)
+                    ),
+                    RatingField(
+                      initialRating: _currentRating == 0.0 ? 1.0 : _currentRating, 
+                      onRatingUpdate: (rating) async {
+                        setState(() => _currentRating = rating);
+                        final book = _book;
+                        if (book != null) {
+                          await _booksService.updateBook(
+                            documentId: book.documentId, 
+                            bookTitle: _textControllerTitle.text, 
+                            bookAuthor: _textControllerAuthor.text, 
+                            bookNotes: _textControllerNotes.text, 
+                            bookRating: rating,
+                            );
+                        }
+                      }),
+                    const SizedBox(height: 16,),
+                    const Text(
+                      'Notes:',
+                      style: TextStyle(fontSize: 14, color: Colors.grey)),
                     TextField(
                       controller: _textControllerNotes,
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
                       decoration: const InputDecoration(
-                        hintText: 'Book notes'
+                        hintText: ' '
                       )
                     ),
                   ],

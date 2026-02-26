@@ -62,7 +62,7 @@ class FirebaseCloudStorage {
       bookTitleFieldName: '',
       bookAuthorFieldName: '',
       bookNotesFieldName: '',
-      bookRatingFieldName: '',
+      bookRatingFieldName: 0.0,
     });
     final fetchedBook = await document;
     return CloudBook(

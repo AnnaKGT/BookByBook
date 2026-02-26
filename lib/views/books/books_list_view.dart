@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:book_by_book/services/cloud/cloud_book.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 typedef BookCallback = void Function(CloudBook book);
 
@@ -27,21 +28,36 @@ class BooksListView extends StatelessWidget {
           onTap(book);
         },
         title: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              book.bookAuthor,
-              maxLines: 1,
-              softWrap: true,
-              overflow: TextOverflow.ellipsis,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  book.bookAuthor,
+                  maxLines: 1,
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 14, color: Colors.grey)
+                  ),
+            
+                Text(
+                  book.bookTitle,
+                  maxLines: 1,
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                  ),
+              ],
+            ),
+            RatingBarIndicator(
+              rating: book.bookRating,
+              itemBuilder: (context, index) => Icon(
+                Icons.star,
+                color: Colors.amber,
               ),
-            const Text(' — '),
-            Text(
-              book.bookTitle,
-              maxLines: 1,
-              softWrap: true,
-              overflow: TextOverflow.ellipsis,
-              ),
+              itemCount: 5,
+              itemSize: 20,
+              direction: Axis.horizontal,
+            ),
           ],
         ),
         // trailing: IconButton(
