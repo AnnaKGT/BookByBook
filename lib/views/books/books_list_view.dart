@@ -28,25 +28,28 @@ class BooksListView extends StatelessWidget {
           onTap(book);
         },
         title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  book.bookAuthor,
-                  maxLines: 1,
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 14, color: Colors.grey)
-                  ),
-            
-                Text(
-                  book.bookTitle,
-                  maxLines: 1,
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                  ),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    book.bookAuthor,
+                    maxLines: 1,
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 14, color: Colors.grey)
+                    ),
+              
+                  Text(
+                    book.bookTitle,
+                    maxLines: 1,
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                    ),
+                ],
+              ),
             ),
             RatingBarIndicator(
               rating: book.bookRating,
@@ -55,7 +58,7 @@ class BooksListView extends StatelessWidget {
                 color: Colors.amber,
               ),
               itemCount: 5,
-              itemSize: 20,
+              itemSize: 16,
               direction: Axis.horizontal,
             ),
           ],
