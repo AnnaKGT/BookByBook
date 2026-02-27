@@ -1,3 +1,4 @@
+import 'package:book_by_book/helpers/open_link_in_new.dart';
 import 'package:book_by_book/helpers/rating_input_field.dart';
 import 'package:book_by_book/services/auth/auth_service.dart';
 import 'package:book_by_book/services/cloud/cloud_book.dart';
@@ -138,10 +139,24 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     super.dispose();
   }
 
+  String _buildShareText() {
+    final title = _textControllerTitle.text;
+    final author = _textControllerAuthor.text;
+    final link = _textControllerLink.text;
+
+    final buffer = StringBuffer();
+    buffer.writeln('📖 $title');
+    if (author.isNotEmpty) buffer.writeln('✍️ $author');
+    if (link.isNotEmpty) buffer.writeln('🔗 $link');
+
+    return buffer.toString().trim();
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text('Book Details'),
         actions: [
@@ -153,7 +168,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
               if (_book == null || text.isEmpty) {
                 await showCannotShareEmptyBookDialog(context);
               } else {
-               await SharePlus.instance.share(ShareParams(text: text));
+               await SharePlus.instance.share(ShareParams(text: _buildShareText()));
               }
             },
             icon: const Icon(Icons.share),
@@ -180,7 +195,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
             
             case ConnectionState.done:
               _setupTextControllerListener();
-              return Padding(
+              return SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,13 +226,24 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                     const SizedBox(height: 16,),
                     const Text(
                       'Link:',
-                      style: TextStyle(fontSize: 14, color: Colors.grey)),
-                    TextField(
+                      style: TextStyle(fontSize: 14, color: Colors.grey,)),
+                    ValueListenableBuilder(
+                      valueListenable: _textControllerLink, 
+                      builder: (context, value, _) {
+                        return TextField(
                       controller: _textControllerLink,
-                      decoration: const InputDecoration(
-                        hintText: ' '
-                      )
-                    ),
+                      keyboardType: TextInputType.url,
+                      textAlignVertical: TextAlignVertical.center,
+                      decoration: InputDecoration(
+                        hintText: ' ',
+                        suffixIcon: value.text.isNotEmpty ? IconButton(
+                          onPressed: () => launchLink(_textControllerLink.text), 
+                          icon: const Icon(Icons.open_in_new, size: 16))
+                          : null,
+                        )
+                      );
+                      })
+                    ,
 
                     const SizedBox(height: 24,),
                     const Text(
@@ -249,7 +275,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
                       decoration: const InputDecoration(
-                        hintText: ' '
+                        hintText: ' ',
                       )
                     ),
                   ],
