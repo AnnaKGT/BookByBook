@@ -38,24 +38,28 @@ class FirebaseCloudStorage {
     }
   }
 
-  Stream<Iterable<CloudBook>> allBooks({required String ownerUserId}) =>
-    books.snapshots().map((event) => event.docs
-      .map((doc) => CloudBook.fromSnapshot(doc))
-      .where((book) => book.ownerUserId == ownerUserId
-      ));
-
-  Future<Iterable<CloudBook>> getBooks({required String ownerUserId}) async {
-    try {
-      return await books.where(
-        ownerUserIdFieldName,
-        isEqualTo: ownerUserId,
-      )
-      .get()
-      .then((value) => value.docs.map((doc) => CloudBook.fromSnapshot(doc)));
-    } catch (e) {
-      throw CouldNotGetAllBookException();
-    }
+  Stream<Iterable<CloudBook>> allBooks({required String ownerUserId}) {
+    final allUserBooks = books
+    .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
+    .snapshots()
+    .map((event) => event.docs
+      .map((doc) => CloudBook.fromSnapshot(doc)));
+    return allUserBooks;
   }
+    
+
+  // Future<Iterable<CloudBook>> getBooks({required String ownerUserId}) async {
+  //   try {
+  //     return await books.where(
+  //       ownerUserIdFieldName,
+  //       isEqualTo: ownerUserId,
+  //     )
+  //     .get()
+  //     .then((value) => value.docs.map((doc) => CloudBook.fromSnapshot(doc)));
+  //   } catch (e) {
+  //     throw CouldNotGetAllBookException();
+  //   }
+  // }
 
   Future<CloudBook> createNewBook({required String ownerUserId}) async {
     try {
