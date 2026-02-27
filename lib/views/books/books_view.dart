@@ -65,6 +65,30 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
       body: StreamBuilder(
+        // stream: _booksService.allBooks(ownerUserId: userId),
+        // builder: (context, snapshot) {
+        //   if (snapshot.connectionState == ConnectionState.waiting) {
+        //     return const Center(child: CircularProgressIndicator());
+        //   }
+        //   if (!snapshot.hasData || snapshot.data == null) {
+        //     return const Center(child: CircularProgressIndicator());
+        //   }
+        //   final allBooks = snapshot.data as Iterable<CloudBook>;
+        //   return BooksListView(
+        //     books: allBooks,
+        //     onDeleteBook: (book) async {
+        //       await _booksService.deleteBook(documentId: book.documentId);
+        //     },
+        //     onTap: (book) {
+        //       Navigator.of(context).pushNamed(
+        //         createUpdateBookRoute,
+        //         arguments: book,
+        //       );
+        //     },
+        //   );
+        // },
+
+
                 stream: _booksService.allBooks(ownerUserId: userId), 
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
@@ -84,11 +108,11 @@ class _MainPageState extends State<MainPage> {
                         },
                         );
                      } else {
-                      return const CircularProgressIndicator();
+                      return const Text('active else');
                      }
                     
                     case ConnectionState.waiting:
-                      return const CircularProgressIndicator();
+                      return const Text('Waiting');
 
                     default:
                      return const CircularProgressIndicator();
