@@ -84,11 +84,11 @@ class _MainPageState extends State<MainPage> {
                         },
                         );
                      } else {
-                      return const Text('Waiting for all books');
+                      return const CircularProgressIndicator();
                      }
                     
                     case ConnectionState.waiting:
-                      return const Text('Waiting for all books');
+                      return const CircularProgressIndicator();
 
                     default:
                      return const CircularProgressIndicator();

@@ -78,7 +78,7 @@ class BooksListView extends StatelessWidget {
                       color: Colors.amber,
                     ),
                     itemCount: 5,
-                    itemSize: 16,
+                    itemSize: 12,
                     direction: Axis.horizontal,
                   ),
                 ],

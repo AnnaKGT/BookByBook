@@ -19,6 +19,7 @@ void main() {
   runApp(
     MaterialApp(
       title: 'BookByBook',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
