@@ -1,4 +1,5 @@
 
+import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
 import 'package:book_by_book/services/auth/auth_exceptions.dart';
 import 'package:book_by_book/services/auth/auth_service.dart';
 import 'package:book_by_book/services/auth/bloc/auth_bloc.dart';
@@ -39,16 +40,17 @@ class _LoginViewState extends State<LoginView> {
   if (state is AuthStateLoggedOut) {
 
       if (state.exception is UserNotFoundAuthException || state.exception is WrongPasswordAuthException) {
-        await showErrorDialog(context,"Cannot find a user with the entered credentials!", );
+        await showErrorDialog(context, context.loc.login_error_cannot_find_user, );
       } else if (state.exception is InvalidCredentialsAuthException) {
-        await showErrorDialog(context, "Invalid credentials",);
+        await showErrorDialog(context, context.loc.login_error_wrong_credentials,);
       } else if(state.exception is GenericAuthException){
-        await showErrorDialog(context, "Something went wrong. Try again.",);
+        await showErrorDialog(context, context.loc.login_error_auth_error,);
       }
-    } 
+    }
   },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Log in')),
+        appBar: AppBar(
+          title: Text(context.loc.login),),
         body: FutureBuilder(
           future: AuthService.firebase().initialize(),
           builder: (context, snapshot) {
@@ -58,15 +60,15 @@ class _LoginViewState extends State<LoginView> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      const Text("Please log in to your account to interact with and track the books you’ve read."),
+                      Text(context.loc.login_view_prompt),
                       TextField(
                         controller: _email,
                         keyboardType: TextInputType.emailAddress,
                         enableSuggestions: false,
                         autocorrect: false,
                         autofocus: true,
-                        decoration: const InputDecoration(
-                          hintText: 'Enter your email here',
+                        decoration:  InputDecoration(
+                          hintText: context.loc.email_text_field_placeholder,
                         ),
                       ),
                       TextField(
@@ -74,8 +76,8 @@ class _LoginViewState extends State<LoginView> {
                         obscureText: true,
                         enableSuggestions: false,
                         autocorrect: false,
-                        decoration: const InputDecoration(
-                          hintText: 'Enter your password',
+                        decoration: InputDecoration(
+                          hintText: context.loc.password_text_field_placeholder,
                         ),
                       ),
                       TextButton(
@@ -86,7 +88,7 @@ class _LoginViewState extends State<LoginView> {
                           if (email.isEmpty || password.isEmpty) {
                             await showErrorDialog(
                               context,
-                              "Email and password cannot be empty",
+                              context.loc.login_view_email_and_password_cannot_be_empty,
                             );
                             return;
                           }
@@ -94,26 +96,26 @@ class _LoginViewState extends State<LoginView> {
                             AuthEventLogIn(email: email, password: password),
                           );
                         },
-                        child: const Text('Log in'),
+                        child: Text(context.loc.login),
                       ),
                       TextButton(
                         onPressed: () {
                           context.read<AuthBloc>().add(const AuthEventForgotPassword());
                         },
-                        child: const Text("Forgot password?"),
+                        child: Text(context.loc.login_view_forgot_password),
                       ),
                       TextButton(
                         onPressed: () {
                           context.read<AuthBloc>().add(const AuthEventShouldRegister());
                         },
-                        child: const Text("Not registered yet? Sign up here!"),
+                        child: Text(context.loc.login_view_not_registered_yet,),
                       ),
                       
                     ],
                   ),
                 );
               default:
-                return const Text('Loading ...');
+                return const CircularProgressIndicator();
             }
           },
         ),

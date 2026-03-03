@@ -1,5 +1,6 @@
 import 'package:book_by_book/constants/routes.dart';
 import 'package:book_by_book/enums/menu_action.dart';
+import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
 import 'package:book_by_book/services/auth/auth_service.dart';
 import 'package:book_by_book/services/auth/bloc/auth_bloc.dart';
 import 'package:book_by_book/services/auth/bloc/auth_event.dart';
@@ -9,6 +10,11 @@ import 'package:book_by_book/utilities/dialogs/logout_dialog.dart';
 import 'package:book_by_book/views/books/books_list_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+extension Count<T extends Iterable> on Stream<T> {
+  Stream<int> get getLength => map((event) => event.length);
+
+}
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -32,7 +38,20 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your Books'),
+        
+        title: StreamBuilder(
+          stream: _booksService.allBooks(ownerUserId: userId).getLength,
+          builder: (context, AsyncSnapshot<int> snapshot) {
+            if (snapshot.hasData) {
+              final bookCount = snapshot.data ?? 0;
+              if (bookCount == 0) {}
+              return Text(context.loc.books);
+            } else {
+              return Text(context.loc.books);
+            }
+            
+          }
+        ),
         actions: [
           IconButton(
             onPressed: () {
@@ -54,10 +73,10 @@ class _MainPageState extends State<MainPage> {
               }
             },
             itemBuilder: (context) {
-              return const [
+              return [
                 PopupMenuItem<MenuAction>(
                 value: MenuAction.logout,
-                child: Text('Log out')
+                child: Text(context.loc.logout_button)
                 ),
               ];             
             }
@@ -112,7 +131,18 @@ class _MainPageState extends State<MainPage> {
                      }
                     
                     case ConnectionState.waiting:
-                      return const Text('Waiting');
+                      final renderBox = context.findRenderObject() as RenderBox;
+                      final size = renderBox.size;
+                      return Container(
+                        constraints: BoxConstraints(
+                        maxWidth: size.width * 0.8,
+                        maxHeight: size.height * 0.8,
+                        minWidth: size.width * 0.5,
+                      ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: const CircularProgressIndicator(),
+                        ));
 
                     default:
                      return const CircularProgressIndicator();

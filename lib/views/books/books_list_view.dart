@@ -1,4 +1,5 @@
 
+import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
 import 'package:book_by_book/helpers/empty_books_view.dart';
 import 'package:flutter/material.dart';
 import 'package:book_by_book/services/cloud/cloud_book.dart';
@@ -30,7 +31,7 @@ class BooksListView extends StatelessWidget {
         Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Text(
-          '${books.length} ${books.length == 1 ? 'item' : 'items'}',
+          context.loc.notes_title(books.length),
           style: TextStyle(
             fontSize: 13,
             color: Colors.grey.shade600,

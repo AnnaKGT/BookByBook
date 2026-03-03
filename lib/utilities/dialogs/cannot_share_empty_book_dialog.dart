@@ -1,13 +1,14 @@
+import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
 import 'package:book_by_book/utilities/dialogs/generic_dialog.dart';
 import 'package:flutter/material.dart';
 
 Future<void> showCannotShareEmptyBookDialog(BuildContext context) {
   return showGenericDialog<void> (
     context: context, 
-    title: 'Sharing', 
-    content: 'You cannot share an empty book!', 
+    title: context.loc.sharing, 
+    content: context.loc.cannot_share_empty_note_prompt, 
     optionsBuilder: () => {
-      'OK': null,
+      context.loc.ok: null,
     },
     );
   

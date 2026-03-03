@@ -1,0 +1,73 @@
+{
+
+  "login_view_email_and_password_cannot_be_empty": "Email and password cannot be empty",
+  "author": "Автор",
+  "title": "Назва",
+  "link": "Лінк",
+  "notes": "Нотатки",
+  "how_do_you_like_the_book": "Сподобалась книга?",
+  "please_wait_momemt": "Зачекай хвилинку",
+  "books": "Книги",
+
+  "logout_button": "Вийти",
+  "note": "Книга",
+  "cancel": "Скасувати",
+  "yes": "Так",
+  "delete": "Видалити",
+  "sharing": "Поділитися",
+  "ok": "Ок",
+  "login": "Увійти",
+  "verify_email": "Підтвердити пошту",
+  "register": "Зареєструватися",
+  "restart": "Перезапустити",
+
+  "start_typing_your_note": "Почни писати свою нотатку",
+  "delete_note_prompt": "Точно хочеш видалити цю нотатку?",
+  "cannot_share_empty_note_prompt": "Не можна поділитися порожньою книгою!",
+  "generic_error_prompt": "Сталася помилка",
+  "logout_dialog_prompt": "Ти впевнений, що хочеш вийти?",
+
+  "password_reset": "Скидання пароля",
+  "password_reset_dialog_prompt": "Ми надіслали тобі лист для скидання пароля. Перевір пошту для деталей.",
+
+  "login_error_cannot_find_user": "Не можемо знайти користувача з такими даними!",
+  "login_error_wrong_credentials": "Неправильні дані для входу",
+  "login_error_auth_error": "Помилка авторизації",
+
+  "login_view_prompt": "Увійди в свій акаунт, щоб створювати та редагувати книги!",
+
+  "login_view_forgot_password": "Забув пароль",
+  "login_view_not_registered_yet": "Ще не зареєстрований? Реєструйся!",
+
+  "email_text_field_placeholder": "Введи свою пошту",
+  "password_text_field_placeholder": "Введи свій пароль",
+
+  "forgot_password": "Забув пароль",
+  "forgot_password_view_generic_error": "Не вдалося обробити запит. Перевір, чи ти зареєстрований, або повернися назад і створи акаунт.",
+  "forgot_password_view_prompt": "Якщо забув пароль, просто введи свою пошту — ми надішлемо тобі лист для відновлення паролю.",
+  "forgot_password_view_send_me_link": "Надіслати посилання для відновлення паролю",
+  "forgot_password_view_back_to_login": "Назад до входу",
+
+  "register_error_weak_password": "Пароль занадто слабкий. Обери інший!",
+  "register_error_email_already_in_use": "Ця пошта вже використовується. Спробуй іншу!",
+  "register_error_generic": "Не вдалося зареєструватися. Спробуй пізніше!",
+  "register_error_invalid_email": "Схоже, ця пошта некоректна. Введи іншу адресу!",
+  "register_view_prompt": "Введи пошту та пароль, щоб побачити свої книги!",
+  "register_view_already_registered": "Вже є акаунт? Увійди тут!",
+
+  "verify_email_view_prompt": "Ми надіслали лист для підтвердження. Відкрий його, щоб підтвердити акаунт. Якщо листа ще немає — натисни кнопку нижче!",
+  "verify_email_send_email_verification": "Надіслати лист для підтвердження",
+
+  "notes_title": "{count, plural, =0{Поки що немає книг} =1{1 книга} other{{count} книг(а)}}",
+  "@notes_title": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3 книги"
+      }
+    }
+  }
+
+  
+
+}

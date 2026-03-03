@@ -1,3 +1,4 @@
+import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
 import 'package:book_by_book/helpers/open_link_in_new.dart';
 import 'package:book_by_book/helpers/rating_input_field.dart';
 import 'package:book_by_book/services/auth/auth_service.dart';
@@ -158,7 +159,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: const Text('Book Details'),
+        title: Text(context.loc.note),
         actions: [
           IconButton(
             onPressed: () async {
@@ -201,8 +202,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     
-                    const Text(
-                      'Author:',
+                    Text(
+                      context.loc.author,
                       style: TextStyle(fontSize: 14, color: Colors.grey)),
                     TextField(
                      controller: _textControllerAuthor,
@@ -212,8 +213,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                       
                     ),
                     const SizedBox(height: 16,),
-                    const Text(
-                      'Title:',
+                    Text(
+                      context.loc.title,
                       style: TextStyle(fontSize: 14, color: Colors.grey)),
                     TextField(
                       controller: _textControllerTitle,
@@ -224,8 +225,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                       )
                     ),
                     const SizedBox(height: 16,),
-                    const Text(
-                      'Link:',
+                    Text(
+                      context.loc.link,
                       style: TextStyle(fontSize: 14, color: Colors.grey,)),
                     ValueListenableBuilder(
                       valueListenable: _textControllerLink, 
@@ -246,8 +247,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                     ,
 
                     const SizedBox(height: 24,),
-                    const Text(
-                      'How do you like the book?',
+                    Text(
+                      context.loc.how_do_you_like_the_book,
                       style: TextStyle(fontSize: 14, color: Colors.grey)
                     ),
                     RatingField(
@@ -267,8 +268,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                         }
                       }),
                     const SizedBox(height: 16,),
-                    const Text(
-                      'Notes:',
+                    Text(
+                      context.loc.notes,
                       style: TextStyle(fontSize: 14, color: Colors.grey)),
                     TextField(
                       controller: _textControllerNotes,

@@ -1,5 +1,6 @@
 
 import 'package:book_by_book/constants/routes.dart';
+import 'package:book_by_book/l10n/app_localizations.dart';
 import 'package:book_by_book/services/auth/bloc/auth_bloc.dart';
 import 'package:book_by_book/services/auth/bloc/auth_event.dart';
 import 'package:book_by_book/services/auth/bloc/auth_state.dart';
@@ -18,6 +19,8 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MaterialApp(
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
       title: 'BookByBook',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
