@@ -1,6 +1,6 @@
 {
 
-  "login_view_email_and_password_cannot_be_empty": "Email and password cannot be empty",
+  "login_view_email_and_password_cannot_be_empty": "Перевір пошту та пароль",
   "author": "Автор",
   "title": "Назва",
   "link": "Лінк",
@@ -21,8 +21,8 @@
   "register": "Зареєструватися",
   "restart": "Перезапустити",
 
-  "start_typing_your_note": "Почни писати свою нотатку",
-  "delete_note_prompt": "Точно хочеш видалити цю нотатку?",
+  "start_typing_your_note": "Почни писати книгу",
+  "delete_note_prompt": "Точно хочеш видалити цю книгу?",
   "cannot_share_empty_note_prompt": "Не можна поділитися порожньою книгою!",
   "generic_error_prompt": "Сталася помилка",
   "logout_dialog_prompt": "Ти впевнений, що хочеш вийти?",
