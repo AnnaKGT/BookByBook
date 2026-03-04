@@ -1,9 +1,9 @@
 import 'package:book_by_book/constants/routes.dart';
 import 'package:book_by_book/enums/menu_action.dart';
 import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
-import 'package:book_by_book/services/auth/auth_service.dart';
 import 'package:book_by_book/services/auth/bloc/auth_bloc.dart';
 import 'package:book_by_book/services/auth/bloc/auth_event.dart';
+import 'package:book_by_book/services/auth/bloc/auth_state.dart';
 import 'package:book_by_book/services/cloud/cloud_book.dart';
 import 'package:book_by_book/services/cloud/firebase_cloud_storage.dart';
 import 'package:book_by_book/utilities/dialogs/logout_dialog.dart';
@@ -25,7 +25,8 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   late final FirebaseCloudStorage _booksService;
-  String get userId => AuthService.firebase().currentUser!.id;
+
+  String get userId => (context.read<AuthBloc>().state as AuthStateLoggedIn).user.id;
 
   @override
   void initState() {
