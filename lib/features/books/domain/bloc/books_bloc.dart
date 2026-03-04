@@ -9,10 +9,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class BooksBloc extends Bloc<BooksEvent, BooksState>{
   final BookRepository _repository;
   StreamSubscription? _booksSubscription;
+  String? _ownerUserId;
 
   BooksBloc(this._repository) : super(const BooksStatesLoading()) {
 
     on<BooksEventLoadAll>((event, emit) async {
+      _ownerUserId = event.ownerUserId;
       await _booksSubscription?.cancel();
       emit(const BooksStatesLoading());
 
@@ -31,6 +33,16 @@ class BooksBloc extends Bloc<BooksEvent, BooksState>{
           ownerUserId: event.ownerUserId,
           );
         emit(BookStateCreated(book: book));
+
+        // ✅ Immediately resume the stream so when the user returns
+        // from the create/edit screen, BooksStateLoaded is active again.
+        await emit.forEach(
+          _repository.allBooks(ownerUserId: event.ownerUserId),
+          onData: (books) => BooksStateLoaded(books: books),
+          onError: (_, _) => BooksStateError(
+            exception: CouldNotGetAllBookException(),
+          ),
+        );
       } on Exception catch (e) {
         emit(BooksStateError(exception: e));
       }
