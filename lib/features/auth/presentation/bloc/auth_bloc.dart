@@ -89,7 +89,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           AuthStateLoggedOut(
             exception: null, 
             isLoading: false,
-            loadingText: context.loc.please_wait_momemt,
+            loadingText: "Wait a moment",
             ),
         );
       } else if (!user.isEmailVerified) {

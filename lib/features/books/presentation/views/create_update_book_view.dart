@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
+import 'package:book_by_book/features/books/domain/bloc/books_bloc.dart';
+import 'package:book_by_book/features/books/domain/bloc/books_event.dart';
 import 'package:book_by_book/helpers/open_link_in_new.dart';
 import 'package:book_by_book/helpers/rating_input_field.dart';
 import 'package:book_by_book/features/auth/domain/auth_service.dart';
@@ -10,6 +12,7 @@ import 'package:book_by_book/utilities/dialogs/cannot_share_empty_book_dialog.da
 import 'package:book_by_book/utilities/dialogs/delete_dialog.dart';
 import 'package:book_by_book/utilities/generics/get_arguments_.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 
 class CreateUpdateBookView extends StatefulWidget {
@@ -30,8 +33,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   late final TextEditingController _textControllerNotes;
   late final TextEditingController _textControllerLink;
   double _currentRating = 0.0;
-
-  late Future<CloudBook> _bookFuture;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -46,49 +48,11 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   @override
   void didChangeDependencies() {
   super.didChangeDependencies();
-  _bookFuture = createOrGetExistingBook(context); // cache it here
+  _initBook(); // cache it here
 }
 
-  Timer? _debounce;
-
-  void _textControllerListener() {
-    _debounce?.cancel();
-
-    _debounce = Timer(const Duration(microseconds: 600), () async {
-      final book = _book;
-    if (book == null) {
-      return;
-    }
-
-    await _booksService.updateBook(
-      documentId: book.documentId, 
-      bookTitle: _textControllerTitle.text,
-      bookAuthor: _textControllerAuthor.text, 
-      bookNotes: _textControllerNotes.text,
-      bookLink: _textControllerLink.text, 
-      bookRating: _currentRating,
-      );
-
-    });
-    
-  }
-
-  void _setupTextControllerListener() {
-    _textControllerAuthor.removeListener(_textControllerListener);
-    _textControllerAuthor.addListener(_textControllerListener);
-    _textControllerTitle.removeListener(_textControllerListener);
-    _textControllerTitle.addListener(_textControllerListener);
-    _textControllerNotes.removeListener(_textControllerListener);
-    _textControllerNotes.addListener(_textControllerListener);
-    _textControllerLink.removeListener(_textControllerListener);
-    _textControllerLink.addListener(_textControllerListener);
-  }
-
-
-  Future<CloudBook> createOrGetExistingBook(BuildContext context) async {
-
+  void _initBook() {
     final widgetBook = context.getArgument<CloudBook>();
-
     if (widgetBook != null) {
       _book = widgetBook;
       _textControllerTitle.text = widgetBook.bookTitle;
@@ -96,52 +60,107 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
       _textControllerNotes.text = widgetBook.bookNotes;
       _textControllerLink.text = widgetBook.bookLink;
       _currentRating = widgetBook.bookRating;
-      return widgetBook;
-    }
-
-    final existingBook = _book;
-    if (existingBook != null) {
-      return existingBook;
-    }
-
-    final currentUser = AuthService.firebase().currentUser!;
-    final userId = currentUser.id;
-    final newBook = await _booksService.createNewBook(ownerUserId: userId);
-    _book = newBook;
-    return newBook;
-  }
-
-  void _deleteBookIfTitleIsEmpty() {
-    final book = _book;
-    if (_textControllerTitle.text.isEmpty && book != null) {
-      _booksService.deleteBook(documentId: book.documentId);
+      _setupTextControllerListener();
     }
   }
 
-  void _saveBookIfTitleIsNotEmpty() async {
-    final book = _book;
-    final textTitle = _textControllerTitle.text;
-    final textAuthor = _textControllerAuthor.text;
-    final textNotes = _textControllerNotes.text;
-    final textLink = _textControllerLink.text;
-    if (textTitle.isNotEmpty && book != null) {
-      await _booksService.updateBook(
+
+  void _textControllerListener() {
+    _debounce?.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 600), () {
+      final book = _book;
+      if (book == null) return;
+      context.read<BooksBloc>().add(BooksEventUpdate(
         documentId: book.documentId, 
-        bookTitle: textTitle,
-        bookAuthor: textAuthor, 
-        bookNotes: textNotes,
-        bookLink: textLink, 
+        bookTitle: _textControllerTitle.text,
+        bookAuthor: _textControllerAuthor.text, 
+        bookNotes: _textControllerNotes.text,
+        bookLink: _textControllerLink.text, 
         bookRating: _currentRating,
-        );
+        ));
+    });
+    
+  }
+
+  void _setupTextControllerListener() {
+    for (final controller in [
+      _textControllerAuthor,
+      _textControllerTitle,
+      _textControllerNotes,
+      _textControllerLink,
+    ]) {
+      controller.removeListener(_textControllerListener);
+      controller.addListener(_textControllerListener);
     }
   }
+
+  String _buildShareText() {
+    final book = _book;
+    if (book == null) return '';
+    return '📚 ${book.bookTitle} by ${book.bookAuthor}\n'
+        '⭐ Rating: $_currentRating\n'
+        '📝 Notes: ${_textControllerNotes.text}\n'
+        '🔗 ${_textControllerLink.text}';
+  }
+
+
+
+  // Future<CloudBook> createOrGetExistingBook(BuildContext context) async {
+
+  //   final widgetBook = context.getArgument<CloudBook>();
+
+  //   if (widgetBook != null) {
+  //     _book = widgetBook;
+  //     _textControllerTitle.text = widgetBook.bookTitle;
+  //     _textControllerAuthor.text = widgetBook.bookAuthor;
+  //     _textControllerNotes.text = widgetBook.bookNotes;
+  //     _textControllerLink.text = widgetBook.bookLink;
+  //     _currentRating = widgetBook.bookRating;
+  //     return widgetBook;
+  //   }
+
+  //   final existingBook = _book;
+  //   if (existingBook != null) {
+  //     return existingBook;
+  //   }
+
+  //   final currentUser = AuthService.firebase().currentUser!;
+  //   final userId = currentUser.id;
+  //   final newBook = await _booksService.createNewBook(ownerUserId: userId);
+  //   _book = newBook;
+  //   return newBook;
+  // }
+
+  // void _deleteBookIfTitleIsEmpty() {
+  //   final book = _book;
+  //   if (_textControllerTitle.text.isEmpty && book != null) {
+  //     _booksService.deleteBook(documentId: book.documentId);
+  //   }
+  // }
+
+  // void _saveBookIfTitleIsNotEmpty() async {
+  //   final book = _book;
+  //   final textTitle = _textControllerTitle.text;
+  //   final textAuthor = _textControllerAuthor.text;
+  //   final textNotes = _textControllerNotes.text;
+  //   final textLink = _textControllerLink.text;
+  //   if (textTitle.isNotEmpty && book != null) {
+  //     await _booksService.updateBook(
+  //       documentId: book.documentId, 
+  //       bookTitle: textTitle,
+  //       bookAuthor: textAuthor, 
+  //       bookNotes: textNotes,
+  //       bookLink: textLink, 
+  //       bookRating: _currentRating,
+  //       );
+  //   }
+  // }
 
  
   @override
   void dispose() {
     _debounce?.cancel();
-    _deleteBookIfTitleIsEmpty();
-    _saveBookIfTitleIsNotEmpty();
     _textControllerAuthor.dispose();
     _textControllerTitle.dispose();
     _textControllerNotes.dispose();
@@ -149,18 +168,18 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     super.dispose();
   }
 
-  String _buildShareText() {
-    final title = _textControllerTitle.text;
-    final author = _textControllerAuthor.text;
-    final link = _textControllerLink.text;
+  // String _buildShareText() {
+  //   final title = _textControllerTitle.text;
+  //   final author = _textControllerAuthor.text;
+  //   final link = _textControllerLink.text;
 
-    final buffer = StringBuffer();
-    buffer.writeln('📖 $title');
-    if (author.isNotEmpty) buffer.writeln('✍️ $author');
-    if (link.isNotEmpty) buffer.writeln('🔗 $link');
+  //   final buffer = StringBuffer();
+  //   buffer.writeln('📖 $title');
+  //   if (author.isNotEmpty) buffer.writeln('✍️ $author');
+  //   if (link.isNotEmpty) buffer.writeln('🔗 $link');
 
-    return buffer.toString().trim();
-  }
+  //   return buffer.toString().trim();
+  // }
 
 
   @override
@@ -172,10 +191,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
         actions: [
           IconButton(
             onPressed: () async {
-
-              final text = _textControllerTitle.text;
-
-              if (_book == null || text.isEmpty) {
+              if (_book == null || _textControllerTitle.text.isEmpty) {
                 await showCannotShareEmptyBookDialog(context);
               } else {
                await SharePlus.instance.share(ShareParams(text: _buildShareText()));
@@ -189,7 +205,9 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
               if (shouldDelete) {
                final book = _book;
                if (book != null) {
-                await _booksService.deleteBook(documentId: book.documentId);
+                context.read<BooksBloc>().add(
+                  BooksEventDelete(documentId: book.documentId)
+                );
                 if (context.mounted) Navigator.of(context).pop();
               }
             }
@@ -198,14 +216,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
         ],
 
       ),
-      body: FutureBuilder(
-        future: _bookFuture, 
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            
-            case ConnectionState.done:
-              _setupTextControllerListener();
-              return SingleChildScrollView(
+      body: SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,13 +301,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                     ),
                   ],
                 ),
-              );
-             
-            default:
-             return const CircularProgressIndicator();
-          }
-        },
-        ),
+              )
+           
     );
   }
 }

@@ -52,12 +52,7 @@ class _RegisterViewState extends State<RegisterView> {
           }}},
       child: Scaffold(
         appBar: AppBar(title: Text(context.loc.register,)),
-        body: FutureBuilder(
-          future: AuthService.firebase().initialize(),
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.done:
-                return Padding(
+        body: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,12 +113,7 @@ class _RegisterViewState extends State<RegisterView> {
                       
                     ],
                   ),
-                );
-              default:
-                return const Text('Loading ...');
-            }
-          },
-        ),
+                )
       ),
     );
   }

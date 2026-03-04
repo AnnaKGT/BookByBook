@@ -1,5 +1,8 @@
 
 import 'package:book_by_book/core/constants/routes.dart';
+import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
+import 'package:book_by_book/features/books/data/firebase_book_repository.dart';
+import 'package:book_by_book/features/books/domain/bloc/books_bloc.dart';
 import 'package:book_by_book/l10n/app_localizations.dart';
 import 'package:book_by_book/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:book_by_book/features/auth/presentation/bloc/auth_event.dart';
@@ -26,8 +29,15 @@ void main() {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: BlocProvider<AuthBloc>(
-        create: (context) => AuthBloc(FirebaseAuthProvider()),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthBloc>(
+            create: (context) => AuthBloc(FirebaseAuthProvider())..add(const AuthEventInitialize()),
+            ),
+          BlocProvider<BooksBloc>(
+            create: (context) => BooksBloc(FirebaseBookRepository())
+            ),
+      ], 
         child: const HomePage(),
       ),
       routes: {
@@ -48,7 +58,7 @@ class HomePage extends StatelessWidget {
         if (state.isLoading) {
           LoadingScreen().show(
             context: context, 
-            text: state.loadingText ?? 'Please wait a momemt',
+            text: state.loadingText ?? Text(context.loc.please_wait_momemt),
             );
         } else {
           LoadingScreen().hide();

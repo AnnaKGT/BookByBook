@@ -54,7 +54,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   void _textControllerListener() {
     _debounce?.cancel();
 
-    _debounce = Timer(const Duration(microseconds: 600), () async {
+    _debounce = Timer(const Duration(milliseconds: 600), () async {
       final book = _book;
     if (book == null) {
       return;

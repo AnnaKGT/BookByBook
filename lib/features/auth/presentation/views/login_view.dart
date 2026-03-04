@@ -51,12 +51,7 @@ class _LoginViewState extends State<LoginView> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(context.loc.login),),
-        body: FutureBuilder(
-          future: AuthService.firebase().initialize(),
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.done:
-                return Padding(
+        body: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
@@ -113,12 +108,8 @@ class _LoginViewState extends State<LoginView> {
                       
                     ],
                   ),
-                );
-              default:
-                return const CircularProgressIndicator();
-            }
-          },
-        ),
+                )
+              
       ),
     );
   }
