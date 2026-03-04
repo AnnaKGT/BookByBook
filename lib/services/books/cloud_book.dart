@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:book_by_book/services/cloud/cloud_storage_constants.dart';
+import 'package:book_by_book/services/books/cloud_storage_constants.dart';
 
 @immutable
 class CloudBook {

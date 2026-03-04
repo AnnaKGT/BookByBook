@@ -4,10 +4,10 @@ import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
 import 'package:book_by_book/services/auth/bloc/auth_bloc.dart';
 import 'package:book_by_book/services/auth/bloc/auth_event.dart';
 import 'package:book_by_book/services/auth/bloc/auth_state.dart';
-import 'package:book_by_book/services/cloud/cloud_book.dart';
-import 'package:book_by_book/services/cloud/firebase_cloud_storage.dart';
+import 'package:book_by_book/services/books/cloud_book.dart';
+import 'package:book_by_book/services/books/firebase_cloud_storage.dart';
 import 'package:book_by_book/utilities/dialogs/logout_dialog.dart';
-import 'package:book_by_book/views/books/books_list_view.dart';
+import 'package:book_by_book/services/books/views/books_list_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -26,7 +26,10 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   late final FirebaseCloudStorage _booksService;
 
-  String get userId => (context.read<AuthBloc>().state as AuthStateLoggedIn).user.id;
+  String? get userId {
+  final state = context.read<AuthBloc>().state;
+  return state is AuthStateLoggedIn ? state.user.id : null;
+  }
 
   @override
   void initState() {
@@ -41,7 +44,7 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         
         title: StreamBuilder(
-          stream: _booksService.allBooks(ownerUserId: userId).getLength,
+          stream: _booksService.allBooks(ownerUserId: userId!).getLength,
           builder: (context, AsyncSnapshot<int> snapshot) {
             if (snapshot.hasData) {
               final bookCount = snapshot.data ?? 0;
@@ -109,7 +112,7 @@ class _MainPageState extends State<MainPage> {
         // },
 
 
-                stream: _booksService.allBooks(ownerUserId: userId), 
+                stream: _booksService.allBooks(ownerUserId: userId!), 
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.active:

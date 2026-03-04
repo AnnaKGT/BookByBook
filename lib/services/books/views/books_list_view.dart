@@ -1,8 +1,8 @@
 
 import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
-import 'package:book_by_book/helpers/empty_books_view.dart';
+import 'package:book_by_book/utilities/empty_books_view.dart';
 import 'package:flutter/material.dart';
-import 'package:book_by_book/services/cloud/cloud_book.dart';
+import 'package:book_by_book/services/books/cloud_book.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 typedef BookCallback = void Function(CloudBook book);

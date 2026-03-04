@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:book_by_book/helpers/loading/loading_screen_controller.dart';
+import 'package:book_by_book/utilities/loading/loading_screen_controller.dart';
 import 'package:flutter/material.dart';
 
 class LoadingScreen {
