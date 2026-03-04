@@ -4,6 +4,7 @@ import 'package:book_by_book/features/auth/presentation/bloc/auth_event.dart';
 import 'package:book_by_book/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(AuthProvider provider) 
     : super(const AuthStateUninitialized(isLoading: true)) {
@@ -86,7 +87,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           AuthStateLoggedOut(
             exception: null, 
             isLoading: false,
-            loadingText: "Wait a moment",
             ),
         );
       } else if (!user.isEmailVerified) {
