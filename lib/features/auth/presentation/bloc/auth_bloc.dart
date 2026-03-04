@@ -1,7 +1,11 @@
 import 'package:bloc/bloc.dart';
-import 'package:book_by_book/services/auth/auth_provider.dart';
-import 'package:book_by_book/services/auth/bloc/auth_event.dart';
-import 'package:book_by_book/services/auth/bloc/auth_state.dart';
+import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
+import 'package:book_by_book/features/auth/domain/auth_provider.dart';
+import 'package:book_by_book/features/auth/presentation/bloc/auth_event.dart';
+import 'package:book_by_book/features/auth/presentation/bloc/auth_state.dart';
+import 'package:path/path.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(AuthProvider provider) 
@@ -82,10 +86,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = provider.currentUser;
       if (user == null) {
         emit(
-          const AuthStateLoggedOut(
+          AuthStateLoggedOut(
             exception: null, 
             isLoading: false,
-            loadingText: "Please wait while I log you in",
+            loadingText: context.loc.please_wait_momemt,
             ),
         );
       } else if (!user.isEmailVerified) {

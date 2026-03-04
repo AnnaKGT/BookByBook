@@ -1,16 +1,16 @@
+import 'dart:async';
+
 import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
 import 'package:book_by_book/helpers/open_link_in_new.dart';
 import 'package:book_by_book/helpers/rating_input_field.dart';
-import 'package:book_by_book/services/auth/auth_service.dart';
-import 'package:book_by_book/services/cloud/cloud_book.dart';
-import 'package:book_by_book/services/cloud/firebase_cloud_storage.dart';
+import 'package:book_by_book/features/auth/domain/auth_service.dart';
+import 'package:book_by_book/features/books/domain/cloud/cloud_book.dart';
+import 'package:book_by_book/features/books/data/firebase_cloud_storage.dart';
 import 'package:book_by_book/utilities/dialogs/cannot_share_empty_book_dialog.dart';
 import 'package:book_by_book/utilities/dialogs/delete_dialog.dart';
-import 'package:book_by_book/utilities/generics/get_argumants.dart';
+import 'package:book_by_book/utilities/generics/get_arguments_.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
-
-typedef BookCallback = void Function(CloudBook book);
 
 class CreateUpdateBookView extends StatefulWidget {
   const CreateUpdateBookView({super.key});
@@ -49,8 +49,13 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   _bookFuture = createOrGetExistingBook(context); // cache it here
 }
 
-  void _textControllerListener() async {
-    final book = _book;
+  Timer? _debounce;
+
+  void _textControllerListener() {
+    _debounce?.cancel();
+
+    _debounce = Timer(const Duration(microseconds: 600), () async {
+      final book = _book;
     if (book == null) {
       return;
     }
@@ -63,6 +68,9 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
       bookLink: _textControllerLink.text, 
       bookRating: _currentRating,
       );
+
+    });
+    
   }
 
   void _setupTextControllerListener() {
@@ -131,6 +139,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
  
   @override
   void dispose() {
+    _debounce?.cancel();
     _deleteBookIfTitleIsEmpty();
     _saveBookIfTitleIsNotEmpty();
     _textControllerAuthor.dispose();

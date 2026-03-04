@@ -1,7 +1,7 @@
 
 import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
-import 'package:book_by_book/services/auth/bloc/auth_bloc.dart';
-import 'package:book_by_book/services/auth/bloc/auth_event.dart';
+import 'package:book_by_book/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:book_by_book/features/auth/presentation/bloc/auth_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

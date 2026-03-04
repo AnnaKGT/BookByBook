@@ -30,6 +30,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get books => 'Книги';
 
   @override
+  String get wait_while_log_you_in => 'Please wait while I log you in';
+
+  @override
   String get logout_button => 'Вийти';
 
   @override
@@ -63,10 +66,10 @@ class AppLocalizationsUk extends AppLocalizations {
   String get restart => 'Перезапустити';
 
   @override
-  String get start_typing_your_note => 'Почни писати свою нотатку';
+  String get start_typing_your_note => 'Почни писати книгу';
 
   @override
-  String get delete_note_prompt => 'Точно хочеш видалити цю нотатку?';
+  String get delete_note_prompt => 'Точно хочеш видалити цю книгу?';
 
   @override
   String get cannot_share_empty_note_prompt =>
@@ -101,7 +104,7 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get login_view_email_and_password_cannot_be_empty =>
-      'Email and password cannot be empty';
+      'Перевір пошту та пароль';
 
   @override
   String get login_view_forgot_password => 'Забув пароль';

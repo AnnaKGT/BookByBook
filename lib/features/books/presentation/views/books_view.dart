@@ -1,13 +1,13 @@
-import 'package:book_by_book/constants/routes.dart';
-import 'package:book_by_book/enums/menu_action.dart';
+import 'package:book_by_book/core/constants/routes.dart';
+import 'package:book_by_book/core/enums/menu_action.dart';
 import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
-import 'package:book_by_book/services/auth/auth_service.dart';
-import 'package:book_by_book/services/auth/bloc/auth_bloc.dart';
-import 'package:book_by_book/services/auth/bloc/auth_event.dart';
-import 'package:book_by_book/services/cloud/cloud_book.dart';
-import 'package:book_by_book/services/cloud/firebase_cloud_storage.dart';
+import 'package:book_by_book/features/auth/domain/auth_service.dart';
+import 'package:book_by_book/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:book_by_book/features/auth/presentation/bloc/auth_event.dart';
+import 'package:book_by_book/features/books/domain/cloud/cloud_book.dart';
+import 'package:book_by_book/features/books/data/firebase_cloud_storage.dart';
 import 'package:book_by_book/utilities/dialogs/logout_dialog.dart';
-import 'package:book_by_book/views/books/books_list_view.dart';
+import 'package:book_by_book/features/books/presentation/views/books_list_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -38,20 +38,23 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text(context.loc.books),
         
-        title: StreamBuilder(
-          stream: _booksService.allBooks(ownerUserId: userId).getLength,
-          builder: (context, AsyncSnapshot<int> snapshot) {
-            if (snapshot.hasData) {
-              final bookCount = snapshot.data ?? 0;
-              if (bookCount == 0) {}
-              return Text(context.loc.books);
-            } else {
-              return Text(context.loc.books);
-            }
+        // For counting books
+        //title: StreamBuilder(
+        //   stream: _booksService.allBooks(ownerUserId: userId).getLength,
+        //   builder: (context, AsyncSnapshot<int> snapshot) {
+        //     if (snapshot.hasData) {
+        //       final bookCount = snapshot.data ?? 0;
+        //       if (bookCount == 0) {}
+        //       return Text(context.loc.books);
+        //     } else {
+        //       return Text(context.loc.books);
+        //     }
             
-          }
-        ),
+        //   }
+        // ),
+
         actions: [
           IconButton(
             onPressed: () {
@@ -84,30 +87,6 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
       body: StreamBuilder(
-        // stream: _booksService.allBooks(ownerUserId: userId),
-        // builder: (context, snapshot) {
-        //   if (snapshot.connectionState == ConnectionState.waiting) {
-        //     return const Center(child: CircularProgressIndicator());
-        //   }
-        //   if (!snapshot.hasData || snapshot.data == null) {
-        //     return const Center(child: CircularProgressIndicator());
-        //   }
-        //   final allBooks = snapshot.data as Iterable<CloudBook>;
-        //   return BooksListView(
-        //     books: allBooks,
-        //     onDeleteBook: (book) async {
-        //       await _booksService.deleteBook(documentId: book.documentId);
-        //     },
-        //     onTap: (book) {
-        //       Navigator.of(context).pushNamed(
-        //         createUpdateBookRoute,
-        //         arguments: book,
-        //       );
-        //     },
-        //   );
-        // },
-
-
                 stream: _booksService.allBooks(ownerUserId: userId), 
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {

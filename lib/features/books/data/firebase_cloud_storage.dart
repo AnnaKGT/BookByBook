@@ -1,6 +1,6 @@
-import 'package:book_by_book/services/cloud/cloud_storage_constants.dart';
-import 'package:book_by_book/services/cloud/cloud_book.dart';
-import 'package:book_by_book/services/cloud/cloud_storage_exceptions.dart';
+import 'package:book_by_book/features/books/domain/cloud/cloud_storage_constants.dart';
+import 'package:book_by_book/features/books/domain/cloud/cloud_book.dart';
+import 'package:book_by_book/features/books/domain/cloud/cloud_storage_exceptions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseCloudStorage {

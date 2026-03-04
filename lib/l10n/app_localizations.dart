@@ -142,6 +142,12 @@ abstract class AppLocalizations {
   /// **'Books'**
   String get books;
 
+  /// No description provided for @wait_while_log_you_in.
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait while I log you in'**
+  String get wait_while_log_you_in;
+
   /// No description provided for @logout_button.
   ///
   /// In en, this message translates to:
