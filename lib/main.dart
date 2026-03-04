@@ -1,4 +1,3 @@
-
 import 'package:book_by_book/constants/routes.dart';
 import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
 import 'package:book_by_book/firebase_options.dart';
@@ -20,25 +19,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
-    MaterialApp(
-      supportedLocales: AppLocalizations.supportedLocales,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      title: 'BookByBook',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    BlocProvider<AuthBloc>(
+      create: (context) => AuthBloc(FirebaseAuthProvider()),
+      child: MaterialApp(
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        title: 'BookByBook',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        ),
+        home: BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(FirebaseAuthProvider()),
+          child: const HomePage(),
+        ),
+        routes: {
+          createUpdateBookRoute: (context) => const CreateUpdateBookView(),
+        },
       ),
-      home: BlocProvider<AuthBloc>(
-        create: (context) => AuthBloc(FirebaseAuthProvider()),
-        child: const HomePage(),
-      ),
-      routes: {
-        createUpdateBookRoute: (context) => const CreateUpdateBookView(),
-      },
     ),
   );
 }
@@ -64,30 +64,29 @@ class _HomePageState extends State<HomePage> {
       listener: (context, state) {
         if (state.isLoading) {
           LoadingScreen().show(
-            context: context, 
-            text: state.loadingText ?? context.loc.please_wait_momemt.toString(),
-            );
+            context: context,
+            text:
+                state.loadingText ?? context.loc.please_wait_momemt.toString(),
+          );
         } else {
           LoadingScreen().hide();
         }
       },
       builder: (context, state) {
-      if (state is AuthStateLoggedIn) {
-        return const MainPage();
-      } else if (state is AuthStateNeedsVerification) {
-        return const VerifyEmailView();
-      } else if (state is AuthStateLoggedOut) {
-        return const LoginView();
-      } else if (state is AuthStateForgotPassword) {
-        return const ForgotPasswordView();
-      } else if (state is AuthStateRegistering) {
-        return const RegisterView();
-      } else {
-        return const Scaffold(
-          body: CircularProgressIndicator()
-        );
-      }
-    },
+        if (state is AuthStateLoggedIn) {
+          return const MainPage();
+        } else if (state is AuthStateNeedsVerification) {
+          return const VerifyEmailView();
+        } else if (state is AuthStateLoggedOut) {
+          return const LoginView();
+        } else if (state is AuthStateForgotPassword) {
+          return const ForgotPasswordView();
+        } else if (state is AuthStateRegistering) {
+          return const RegisterView();
+        } else {
+          return const Scaffold(body: CircularProgressIndicator());
+        }
+      },
     );
   }
 }
