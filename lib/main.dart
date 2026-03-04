@@ -1,5 +1,6 @@
 
 import 'package:book_by_book/constants/routes.dart';
+import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
 import 'package:book_by_book/l10n/app_localizations.dart';
 import 'package:book_by_book/services/auth/bloc/auth_bloc.dart';
 import 'package:book_by_book/services/auth/bloc/auth_event.dart';
@@ -48,7 +49,7 @@ class HomePage extends StatelessWidget {
         if (state.isLoading) {
           LoadingScreen().show(
             context: context, 
-            text: state.loadingText ?? 'Please wait a momemt',
+            text: state.loadingText ?? context.loc.please_wait_momemt.toString(),
             );
         } else {
           LoadingScreen().hide();
