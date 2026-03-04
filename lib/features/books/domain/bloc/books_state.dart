@@ -30,3 +30,7 @@ class BooksStateError extends BooksState {
   final Exception exception;
   const BooksStateError({required this.exception});
 }
+
+class BooksStateDeleted extends BooksState {
+  const BooksStateDeleted();
+}

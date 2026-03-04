@@ -85,11 +85,16 @@ class BooksListView extends StatelessWidget {
                 ],
               ),
               // trailing: IconButton(
-              //   onPressed: () async {
+              //   onPressed: ()  async {
               //     final shouldDelete = await showDeleteDialog(context);
               //     if (shouldDelete) {
-              //       onDeleteBook(book);
-              //     }
+              //       if (!context.mounted) return;
+              //       context.read<BooksBloc>().add(
+              //         BooksEventDelete(documentId: book.documentId)
+              //       );
+              //       if (context.mounted) Navigator.of(context).pop();
+                  
+              //   }
               //   },
               //   icon: const Icon(Icons.delete),
               // ),

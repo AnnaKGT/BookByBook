@@ -62,6 +62,7 @@ class BooksBloc extends Bloc<BooksEvent, BooksState>{
       if (event.currentTitle.trim().isEmpty) {
         try {
           await _repository.deleteBook(documentId: event.documentId);
+          emit(const BooksStateDeleted());
         } on Exception catch (e) {
           emit(BooksStateError(exception: e));
         }
