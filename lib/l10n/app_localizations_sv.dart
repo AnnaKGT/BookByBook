@@ -30,9 +30,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get books => 'Books';
 
   @override
-  String get wait_while_log_you_in => 'Please wait while I log you in';
-
-  @override
   String get logout_button => 'Logga ut';
 
   @override

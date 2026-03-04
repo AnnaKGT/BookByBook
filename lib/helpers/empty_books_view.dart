@@ -1,4 +1,4 @@
-import 'package:book_by_book/core/constants/routes.dart';
+import 'package:book_by_book/constants/routes.dart';
 import 'package:flutter/material.dart';
 
 class EmptyBooksView extends StatelessWidget {

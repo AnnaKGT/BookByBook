@@ -1,7 +1,7 @@
 import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
-import 'package:book_by_book/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:book_by_book/features/auth/presentation/bloc/auth_event.dart';
-import 'package:book_by_book/features/auth/presentation/bloc/auth_state.dart';
+import 'package:book_by_book/services/auth/bloc/auth_bloc.dart';
+import 'package:book_by_book/services/auth/bloc/auth_event.dart';
+import 'package:book_by_book/services/auth/bloc/auth_state.dart';
 import 'package:book_by_book/utilities/dialogs/error_dialog.dart';
 import 'package:book_by_book/utilities/dialogs/password_reset_email_sent_dialog.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +39,6 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
             await showPasswordResetSentDialog(context);
           }
           if (state.exception != null) {
-            if (!context.mounted) return;
             await showErrorDialog(
               context, 
               context.loc.forgot_password_view_generic_error);

@@ -1,9 +1,10 @@
 
 import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
-import 'package:book_by_book/features/auth/domain/auth_exceptions.dart';
-import 'package:book_by_book/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:book_by_book/features/auth/presentation/bloc/auth_event.dart';
-import 'package:book_by_book/features/auth/presentation/bloc/auth_state.dart';
+import 'package:book_by_book/services/auth/auth_exceptions.dart';
+import 'package:book_by_book/services/auth/auth_service.dart';
+import 'package:book_by_book/services/auth/bloc/auth_bloc.dart';
+import 'package:book_by_book/services/auth/bloc/auth_event.dart';
+import 'package:book_by_book/services/auth/bloc/auth_state.dart';
 import 'package:book_by_book/utilities/dialogs/error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -51,7 +52,12 @@ class _RegisterViewState extends State<RegisterView> {
           }}},
       child: Scaffold(
         appBar: AppBar(title: Text(context.loc.register,)),
-        body: Padding(
+        body: FutureBuilder(
+          future: AuthService.firebase().initialize(),
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.done:
+                return Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,7 +118,12 @@ class _RegisterViewState extends State<RegisterView> {
                       
                     ],
                   ),
-                )
+                );
+              default:
+                return const Text('Loading ...');
+            }
+          },
+        ),
       ),
     );
   }

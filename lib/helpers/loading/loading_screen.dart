@@ -17,7 +17,7 @@ class LoadingScreen {
 
   void show({
     required BuildContext context,
-    required text,
+    required String text,
   }) {
     if (controller?.update(text) ?? false) {
       return;

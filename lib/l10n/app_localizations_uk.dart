@@ -30,9 +30,6 @@ class AppLocalizationsUk extends AppLocalizations {
   String get books => 'Книги';
 
   @override
-  String get wait_while_log_you_in => 'Please wait while I log you in';
-
-  @override
   String get logout_button => 'Вийти';
 
   @override

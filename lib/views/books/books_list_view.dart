@@ -1,11 +1,11 @@
 
-import 'package:book_by_book/core/typedefs/book_typedefs.dart';
 import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
 import 'package:book_by_book/helpers/empty_books_view.dart';
 import 'package:flutter/material.dart';
-import 'package:book_by_book/features/books/domain/cloud/cloud_book.dart';
+import 'package:book_by_book/services/cloud/cloud_book.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
+typedef BookCallback = void Function(CloudBook book);
 
 class BooksListView extends StatelessWidget {
   final Iterable<CloudBook> books;
@@ -85,16 +85,11 @@ class BooksListView extends StatelessWidget {
                 ],
               ),
               // trailing: IconButton(
-              //   onPressed: ()  async {
+              //   onPressed: () async {
               //     final shouldDelete = await showDeleteDialog(context);
               //     if (shouldDelete) {
-              //       if (!context.mounted) return;
-              //       context.read<BooksBloc>().add(
-              //         BooksEventDelete(documentId: book.documentId)
-              //       );
-              //       if (context.mounted) Navigator.of(context).pop();
-                  
-              //   }
+              //       onDeleteBook(book);
+              //     }
               //   },
               //   icon: const Icon(Icons.delete),
               // ),

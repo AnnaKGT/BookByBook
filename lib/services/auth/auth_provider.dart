@@ -1,4 +1,4 @@
-import 'package:book_by_book/features/auth/domain/auth_user.dart';
+import 'package:book_by_book/services/auth/auth_user.dart';
 
 abstract class AuthProvider {
   Future<void> initialize();

@@ -1,6 +1,6 @@
-import 'package:book_by_book/features/auth/domain/auth_exceptions.dart';
-import 'package:book_by_book/features/auth/domain/auth_provider.dart';
-import 'package:book_by_book/features/auth/domain/auth_user.dart';
+import 'package:book_by_book/services/auth/auth_exceptions.dart';
+import 'package:book_by_book/services/auth/auth_provider.dart';
+import 'package:book_by_book/services/auth/auth_user.dart';
 import 'package:test/test.dart';
 
 void main ( ) {

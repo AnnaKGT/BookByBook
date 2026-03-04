@@ -1,19 +1,16 @@
 
-import 'package:book_by_book/core/constants/routes.dart';
-import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
-import 'package:book_by_book/features/books/data/firebase_book_repository.dart';
-import 'package:book_by_book/features/books/domain/bloc/books_bloc.dart';
+import 'package:book_by_book/constants/routes.dart';
 import 'package:book_by_book/l10n/app_localizations.dart';
-import 'package:book_by_book/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:book_by_book/features/auth/presentation/bloc/auth_event.dart';
-import 'package:book_by_book/features/auth/presentation/bloc/auth_state.dart';
-import 'package:book_by_book/features/auth/data/firebase_auth_provider.dart';
-import 'package:book_by_book/features/books/presentation/views/create_update_book_view.dart';
-import 'package:book_by_book/features/auth/presentation/views/forgot_password_view.dart';
-import 'package:book_by_book/features/auth/presentation/views/login_view.dart';
-import 'package:book_by_book/features/books/presentation/views/books_view.dart';
-import 'package:book_by_book/features/auth/presentation/views/register_view.dart';
-import 'package:book_by_book/features/auth/presentation/views/verify_email.dart';
+import 'package:book_by_book/services/auth/bloc/auth_bloc.dart';
+import 'package:book_by_book/services/auth/bloc/auth_event.dart';
+import 'package:book_by_book/services/auth/bloc/auth_state.dart';
+import 'package:book_by_book/services/auth/firebase_auth_provider.dart';
+import 'package:book_by_book/views/books/create_update_book_view.dart';
+import 'package:book_by_book/views/forgot_password_view.dart';
+import 'package:book_by_book/views/login_view.dart';
+import 'package:book_by_book/views/books/books_view.dart';
+import 'package:book_by_book/views/register_view.dart';
+import 'package:book_by_book/views/verify_email.dart';
 import 'package:book_by_book/helpers/loading/loading_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,15 +26,8 @@ void main() {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: MultiBlocProvider(
-        providers: [
-          BlocProvider<AuthBloc>(
-            create: (context) => AuthBloc(FirebaseAuthProvider())..add(const AuthEventInitialize()),
-            ),
-          BlocProvider<BooksBloc>(
-            create: (context) => BooksBloc(FirebaseBookRepository())
-            ),
-      ], 
+      home: BlocProvider<AuthBloc>(
+        create: (context) => AuthBloc(FirebaseAuthProvider()),
         child: const HomePage(),
       ),
       routes: {
@@ -52,13 +42,13 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
+    context.read<AuthBloc>().add(const AuthEventInitialize());
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state.isLoading) {
           LoadingScreen().show(
             context: context, 
-            text: state.loadingText ?? Text(context.loc.please_wait_momemt),
+            text: state.loadingText ?? 'Please wait a momemt',
             );
         } else {
           LoadingScreen().hide();
