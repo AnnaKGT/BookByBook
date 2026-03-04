@@ -41,3 +41,15 @@ class BooksEventDelete extends BooksEvent {
   final String documentId;
   const BooksEventDelete({required this.documentId});
 }
+
+//auto-delete a book if the user left its title empty (replaces
+// the old dispose-time _deleteBookIfTitleIsEmpty() that called
+// FirebaseCloudStorage directly).
+class BooksEventDeleteIfEmpty extends BooksEvent {
+  final String documentId;
+  final String currentTitle;
+  const BooksEventDeleteIfEmpty({
+    required this.documentId,
+    required this.currentTitle,
+  });
+}

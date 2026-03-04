@@ -25,8 +25,8 @@ class FirebaseBookRepository implements BookRepository{
     try {
       final ref = await _books.add({
         ownerUserIdFieldName: ownerUserId,
-        bookAuthorFieldName: " ",
-        bookTitleFieldName: " ",
+        bookAuthorFieldName: "",
+        bookTitleFieldName: "",
         bookNotesFieldName: '',
         bookLinkFieldName: '',
         bookRatingFieldName: 0.0,
@@ -34,11 +34,11 @@ class FirebaseBookRepository implements BookRepository{
       return CloudBook(
         documentId: ref.id, 
         ownerUserId: ownerUserId, 
-        bookTitle: ' ', 
-        bookAuthor: ' ',
+        bookTitle: '', 
+        bookAuthor: '',
         bookRating: 0.0,
-        bookNotes: ' ',
-        bookLink: ' ',
+        bookNotes: '',
+        bookLink: '',
         );
 
     } catch (e) {

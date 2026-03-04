@@ -6,7 +6,6 @@ import 'package:book_by_book/features/books/domain/bloc/books_event.dart';
 import 'package:book_by_book/helpers/open_link_in_new.dart';
 import 'package:book_by_book/helpers/rating_input_field.dart';
 import 'package:book_by_book/features/books/domain/cloud/cloud_book.dart';
-import 'package:book_by_book/features/books/data/firebase_cloud_storage.dart';
 import 'package:book_by_book/utilities/dialogs/cannot_share_empty_book_dialog.dart';
 import 'package:book_by_book/utilities/dialogs/delete_dialog.dart';
 import 'package:book_by_book/utilities/generics/get_arguments_.dart';
@@ -22,21 +21,21 @@ class CreateUpdateBookView extends StatefulWidget {
 }
 
 
-
 class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
 
   CloudBook? _book;
-  late final FirebaseCloudStorage _booksService;
+
   late final TextEditingController _textControllerAuthor;
   late final TextEditingController _textControllerTitle;
   late final TextEditingController _textControllerNotes;
   late final TextEditingController _textControllerLink;
   double _currentRating = 0.0;
   Timer? _debounce;
+  bool _initialized = false;
 
   @override
   void initState() {
-    _booksService = FirebaseCloudStorage();
+
     _textControllerAuthor = TextEditingController();
     _textControllerTitle = TextEditingController();
     _textControllerNotes = TextEditingController();
@@ -47,7 +46,11 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   @override
   void didChangeDependencies() {
   super.didChangeDependencies();
-  _initBook(); // cache it here
+  if (!_initialized) {
+    _initialized = true;
+    _initBook(); // cache it here
+  }
+
 }
 
   void _initBook() {
@@ -95,66 +98,17 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   }
 
   String _buildShareText() {
-    final book = _book;
-    if (book == null) return '';
-    return '📚 ${book.bookTitle} by ${book.bookAuthor}\n'
-        '⭐ Rating: $_currentRating\n'
-        '📝 Notes: ${_textControllerNotes.text}\n'
-        '🔗 ${_textControllerLink.text}';
+    final title = _textControllerTitle.text;
+    final author = _textControllerAuthor.text;
+    final link = _textControllerLink.text;
+
+    final buffer = StringBuffer();
+    buffer.writeln('📖 $title');
+    if (author.isNotEmpty) buffer.writeln('✍️ $author');
+    if (link.isNotEmpty) buffer.writeln('🔗 $link');
+
+    return buffer.toString().trim();
   }
-
-
-
-  // Future<CloudBook> createOrGetExistingBook(BuildContext context) async {
-
-  //   final widgetBook = context.getArgument<CloudBook>();
-
-  //   if (widgetBook != null) {
-  //     _book = widgetBook;
-  //     _textControllerTitle.text = widgetBook.bookTitle;
-  //     _textControllerAuthor.text = widgetBook.bookAuthor;
-  //     _textControllerNotes.text = widgetBook.bookNotes;
-  //     _textControllerLink.text = widgetBook.bookLink;
-  //     _currentRating = widgetBook.bookRating;
-  //     return widgetBook;
-  //   }
-
-  //   final existingBook = _book;
-  //   if (existingBook != null) {
-  //     return existingBook;
-  //   }
-
-  //   final currentUser = AuthService.firebase().currentUser!;
-  //   final userId = currentUser.id;
-  //   final newBook = await _booksService.createNewBook(ownerUserId: userId);
-  //   _book = newBook;
-  //   return newBook;
-  // }
-
-  // void _deleteBookIfTitleIsEmpty() {
-  //   final book = _book;
-  //   if (_textControllerTitle.text.isEmpty && book != null) {
-  //     _booksService.deleteBook(documentId: book.documentId);
-  //   }
-  // }
-
-  // void _saveBookIfTitleIsNotEmpty() async {
-  //   final book = _book;
-  //   final textTitle = _textControllerTitle.text;
-  //   final textAuthor = _textControllerAuthor.text;
-  //   final textNotes = _textControllerNotes.text;
-  //   final textLink = _textControllerLink.text;
-  //   if (textTitle.isNotEmpty && book != null) {
-  //     await _booksService.updateBook(
-  //       documentId: book.documentId, 
-  //       bookTitle: textTitle,
-  //       bookAuthor: textAuthor, 
-  //       bookNotes: textNotes,
-  //       bookLink: textLink, 
-  //       bookRating: _currentRating,
-  //       );
-  //   }
-  // }
 
  
   @override
@@ -166,21 +120,6 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     _textControllerLink.dispose();
     super.dispose();
   }
-
-  // String _buildShareText() {
-  //   final title = _textControllerTitle.text;
-  //   final author = _textControllerAuthor.text;
-  //   final link = _textControllerLink.text;
-
-  //   final buffer = StringBuffer();
-  //   buffer.writeln('📖 $title');
-  //   if (author.isNotEmpty) buffer.writeln('✍️ $author');
-  //   if (link.isNotEmpty) buffer.writeln('🔗 $link');
-
-  //   return buffer.toString().trim();
-  // }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -274,19 +213,9 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                     ),
                     RatingField(
                       initialRating: _currentRating == 0.0 ? 1.0 : _currentRating, 
-                      onRatingUpdate: (rating) async {
+                      onRatingUpdate: (rating) {
                         setState(() => _currentRating = rating);
-                        final book = _book;
-                        if (book != null) {
-                          await _booksService.updateBook(
-                            documentId: book.documentId, 
-                            bookTitle: _textControllerTitle.text, 
-                            bookAuthor: _textControllerAuthor.text, 
-                            bookNotes: _textControllerNotes.text,
-                            bookLink: _textControllerLink.text, 
-                            bookRating: rating,
-                            );
-                        }
+                        _textControllerListener();
                       }),
                     const SizedBox(height: 16,),
                     Text(
