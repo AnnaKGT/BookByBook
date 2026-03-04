@@ -19,7 +19,7 @@ class BooksBloc extends Bloc<BooksEvent, BooksState>{
       await emit.forEach(
         _repository.allBooks(ownerUserId: event.ownerUserId), 
         onData: (books) => BooksStateLoaded(books: books),
-        onError: (_, __) => BooksStateError(
+        onError: (_, _) => BooksStateError(
           exception: CouldNotGetAllBookException()
           ),
         );

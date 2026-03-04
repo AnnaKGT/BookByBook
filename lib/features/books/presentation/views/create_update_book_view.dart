@@ -5,7 +5,6 @@ import 'package:book_by_book/features/books/domain/bloc/books_bloc.dart';
 import 'package:book_by_book/features/books/domain/bloc/books_event.dart';
 import 'package:book_by_book/helpers/open_link_in_new.dart';
 import 'package:book_by_book/helpers/rating_input_field.dart';
-import 'package:book_by_book/features/auth/domain/auth_service.dart';
 import 'package:book_by_book/features/books/domain/cloud/cloud_book.dart';
 import 'package:book_by_book/features/books/data/firebase_cloud_storage.dart';
 import 'package:book_by_book/utilities/dialogs/cannot_share_empty_book_dialog.dart';
@@ -205,6 +204,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
               if (shouldDelete) {
                final book = _book;
                if (book != null) {
+                if (!context.mounted) return;
                 context.read<BooksBloc>().add(
                   BooksEventDelete(documentId: book.documentId)
                 );

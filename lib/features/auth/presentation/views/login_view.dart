@@ -1,7 +1,6 @@
 
 import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
 import 'package:book_by_book/features/auth/domain/auth_exceptions.dart';
-import 'package:book_by_book/features/auth/domain/auth_service.dart';
 import 'package:book_by_book/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:book_by_book/features/auth/presentation/bloc/auth_event.dart';
 import 'package:book_by_book/features/auth/presentation/bloc/auth_state.dart';

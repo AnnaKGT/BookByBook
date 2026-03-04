@@ -39,6 +39,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
             await showPasswordResetSentDialog(context);
           }
           if (state.exception != null) {
+            if (!context.mounted) return;
             await showErrorDialog(
               context, 
               context.loc.forgot_password_view_generic_error);
