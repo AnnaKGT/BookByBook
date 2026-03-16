@@ -29,7 +29,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   late final TextEditingController _textControllerTitle;
   late final TextEditingController _textControllerNotes;
   late final TextEditingController _textControllerLink;
-  late DateTime _selectedDate;
+  late DateTime _selectedDate = DateTime.now();
   double _currentRating = 0.0;
 
   late Future<CloudBook> _bookFuture;
@@ -253,6 +253,18 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                       )
                     ),
                     const SizedBox(height: 16,),
+                    ListTile(
+                      // contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.calendar_today),
+                      title: Text(
+                        // 'Date added: ${_formatDate(_selectedDate)}',
+                        _formatDate(_selectedDate),
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      // trailing: const Icon(Icons.edit, size: 18),
+                      onTap: _pickDate,
+                    ),
+                    const SizedBox(height: 16,),
                     Text(
                       context.loc.link,
                       style: TextStyle(fontSize: 14, color: Colors.grey,)),
@@ -273,15 +285,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                       );
                       })
                     ,
-                    ListTile(
-                      leading: const Icon(Icons.calendar_today),
-                      title: Text(
-                        'Date added: ${_formatDate(_selectedDate)}',
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                      trailing: const Icon(Icons.edit, size: 18),
-                      onTap: _pickDate,
-                    ),
+                   
                     const SizedBox(height: 24,),
                     Text(
                       context.loc.how_do_you_like_the_book,
