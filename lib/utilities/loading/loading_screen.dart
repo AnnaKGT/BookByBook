@@ -37,8 +37,9 @@ class LoadingScreen {
     _text.add(text);
 
     final state = Overlay.of(context);
-    final renderBox = context.findRenderObject() as RenderBox;
-    final size = renderBox.size;
+    final size = MediaQuery.of(context).size;
+    // final renderBox = context.findRenderObject() as RenderBox;
+    // final size = renderBox.size;
 
     final overlay = OverlayEntry(
       builder: (context) {

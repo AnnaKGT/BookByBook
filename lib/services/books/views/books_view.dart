@@ -135,8 +135,9 @@ class _MainPageState extends State<MainPage> {
                      }
                     
                     case ConnectionState.waiting:
-                      final renderBox = context.findRenderObject() as RenderBox;
-                      final size = renderBox.size;
+                      final size = MediaQuery.of(context).size;
+                      // final renderBox = context.findRenderObject() as RenderBox;
+                      // final size = renderBox.size;
                       return Container(
                         constraints: BoxConstraints(
                         maxWidth: size.width * 0.8,
