@@ -29,6 +29,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   late final TextEditingController _textControllerTitle;
   late final TextEditingController _textControllerNotes;
   late final TextEditingController _textControllerLink;
+  late DateTime _selectedDate;
   double _currentRating = 0.0;
 
   late Future<CloudBook> _bookFuture;
@@ -40,6 +41,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     _textControllerTitle = TextEditingController();
     _textControllerNotes = TextEditingController();
     _textControllerLink = TextEditingController();
+    _selectedDate = DateTime.now();
     super.initState();
   }
 
@@ -62,6 +64,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
       bookNotes: _textControllerNotes.text,
       bookLink: _textControllerLink.text, 
       bookRating: _currentRating,
+      bookDate: _selectedDate,
       );
   }
 
@@ -88,6 +91,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
       _textControllerNotes.text = widgetBook.bookNotes;
       _textControllerLink.text = widgetBook.bookLink;
       _currentRating = widgetBook.bookRating;
+      _selectedDate = widgetBook.bookDate;
       return widgetBook;
     }
 
@@ -124,7 +128,31 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
         bookNotes: textNotes,
         bookLink: textLink, 
         bookRating: _currentRating,
+        bookDate: _selectedDate,
         );
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    // Simple format — or use intl package for localization
+    return '${date.day.toString().padLeft(2, '0')}.'
+        '${date.month.toString().padLeft(2, '0')}.'
+        '${date.year}';
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+      // Immediately persist the change
+      _saveBookIfTitleIsNotEmpty();
     }
   }
 
@@ -245,7 +273,15 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                       );
                       })
                     ,
-
+                    ListTile(
+                      leading: const Icon(Icons.calendar_today),
+                      title: Text(
+                        'Date added: ${_formatDate(_selectedDate)}',
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      trailing: const Icon(Icons.edit, size: 18),
+                      onTap: _pickDate,
+                    ),
                     const SizedBox(height: 24,),
                     Text(
                       context.loc.how_do_you_like_the_book,
@@ -264,6 +300,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                             bookNotes: _textControllerNotes.text,
                             bookLink: _textControllerLink.text, 
                             bookRating: rating,
+                            bookDate: _selectedDate,
                             );
                         }
                       }),

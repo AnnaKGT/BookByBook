@@ -11,6 +11,7 @@ class CloudBook {
   final double bookRating;
   final String bookNotes;
   final String bookLink;
+  final DateTime bookDate;
 
   const CloudBook({
     required this.documentId,
@@ -20,6 +21,7 @@ class CloudBook {
     this.bookRating = 0.0, 
     this.bookNotes = ' ',
     this.bookLink = ' ',
+    required this.bookDate,
     });
 
   CloudBook.fromSnapshot(QueryDocumentSnapshot<Map<String, dynamic>> snapshot) : 
@@ -29,5 +31,6 @@ class CloudBook {
    bookNotes = snapshot.data()[bookNotesFieldName] as String? ?? '',
    bookAuthor = snapshot.data()[bookAuthorFieldName] as String? ?? '',
    bookLink = snapshot.data()[bookLinkFieldName] as String? ?? '',
-   bookRating = (snapshot.data()[bookRatingFieldName] as num?)?.toDouble() ?? 0.0;
+   bookRating = (snapshot.data()[bookRatingFieldName] as num?)?.toDouble() ?? 0.0,
+   bookDate = (snapshot.data()[bookDateFieldName] as Timestamp?)?.toDate() ?? DateTime.now();
 }

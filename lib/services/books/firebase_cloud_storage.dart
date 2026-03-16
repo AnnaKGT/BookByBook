@@ -23,7 +23,8 @@ class FirebaseCloudStorage {
     required String bookAuthor,
     required String bookNotes,
     required String bookLink,
-    required double bookRating
+    required double bookRating,
+    required DateTime bookDate,
   }) async {
     try {
       await books.doc(documentId).update({
@@ -32,6 +33,7 @@ class FirebaseCloudStorage {
         bookRatingFieldName: bookRating,
         bookNotesFieldName: bookNotes,
         bookLinkFieldName: bookLink,
+        bookDateFieldName: Timestamp.fromDate(bookDate),
       });
     } catch (e) {
       throw CouldNotUpdateBookException();
@@ -63,6 +65,7 @@ class FirebaseCloudStorage {
 
   Future<CloudBook> createNewBook({required String ownerUserId}) async {
     try {
+      final now = DateTime.now();
       final document = books.add({
       ownerUserIdFieldName: ownerUserId,
       bookTitleFieldName: '',
@@ -70,6 +73,7 @@ class FirebaseCloudStorage {
       bookNotesFieldName: '',
       bookLinkFieldName: '',
       bookRatingFieldName: 0.0,
+      bookDateFieldName: Timestamp.fromDate(now)
     });
     final fetchedBook = await document;
     return CloudBook(
@@ -80,6 +84,7 @@ class FirebaseCloudStorage {
       bookRating: 0.0, 
       bookNotes: '',
       bookLink: '',
+      bookDate: now,
       );
     } catch (e) {
       throw CouldNotCreateBookException();
