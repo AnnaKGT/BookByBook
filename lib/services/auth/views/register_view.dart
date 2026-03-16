@@ -57,66 +57,68 @@ class _RegisterViewState extends State<RegisterView> {
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.done:
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(context.loc.register_view_prompt),
-                      TextField(
-                        controller: _email,
-                        keyboardType: TextInputType.emailAddress,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        autofocus: true,
-                        decoration: InputDecoration(
-                          hintText: context.loc.email_text_field_placeholder,
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(context.loc.register_view_prompt),
+                        TextField(
+                          controller: _email,
+                          keyboardType: TextInputType.emailAddress,
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          autofocus: true,
+                          decoration: InputDecoration(
+                            hintText: context.loc.email_text_field_placeholder,
+                          ),
                         ),
-                      ),
-                      TextField(
-                        controller: _password,
-                        obscureText: true,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        decoration: InputDecoration(
-                          hintText: context.loc.password_text_field_placeholder,
+                        TextField(
+                          controller: _password,
+                          obscureText: true,
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          decoration: InputDecoration(
+                            hintText: context.loc.password_text_field_placeholder,
+                          ),
                         ),
-                      ),
-                      Center(
-                        child: Column(
-                          children: [
-                            TextButton(
-                              onPressed: () async {
-                                final email = _email.text;
-                                final password = _password.text;
-                                if (email.isEmpty || password.isEmpty) {
-                                  await showErrorDialog(
-                                    context,
-                                    context.loc.login_view_email_and_password_cannot_be_empty,
-                                  );
-                                  return;
-                                }
-                                              
-                                context.read<AuthBloc>().add(AuthEventRegister(
-                                  email,
-                                  password,
-                                  ));
-                              },
-                              child: Text(context.loc.register),
-                            ),
-                            TextButton(
-                          onPressed: () {
-                           context.read<AuthBloc>().add(
-                            const AuthEventLogOut(),
-                           );
-                          },
-                          child: Text(context.loc.register_view_already_registered),
+                        Center(
+                          child: Column(
+                            children: [
+                              TextButton(
+                                onPressed: () async {
+                                  final email = _email.text;
+                                  final password = _password.text;
+                                  if (email.isEmpty || password.isEmpty) {
+                                    await showErrorDialog(
+                                      context,
+                                      context.loc.login_view_email_and_password_cannot_be_empty,
+                                    );
+                                    return;
+                                  }
+                                                
+                                  context.read<AuthBloc>().add(AuthEventRegister(
+                                    email,
+                                    password,
+                                    ));
+                                },
+                                child: Text(context.loc.register),
+                              ),
+                              TextButton(
+                            onPressed: () {
+                             context.read<AuthBloc>().add(
+                              const AuthEventLogOut(),
+                             );
+                            },
+                            child: Text(context.loc.register_view_already_registered),
+                          ),
+                            ],
+                          ),
                         ),
-                          ],
-                        ),
-                      ),
-                      
-                    ],
+                        
+                      ],
+                    ),
                   ),
                 );
               default:

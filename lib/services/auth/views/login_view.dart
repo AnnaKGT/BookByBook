@@ -56,62 +56,64 @@ class _LoginViewState extends State<LoginView> {
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.done:
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Text(context.loc.login_view_prompt),
-                      TextField(
-                        controller: _email,
-                        keyboardType: TextInputType.emailAddress,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        autofocus: true,
-                        decoration:  InputDecoration(
-                          hintText: context.loc.email_text_field_placeholder,
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Text(context.loc.login_view_prompt),
+                        TextField(
+                          controller: _email,
+                          keyboardType: TextInputType.emailAddress,
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          autofocus: true,
+                          decoration:  InputDecoration(
+                            hintText: context.loc.email_text_field_placeholder,
+                          ),
                         ),
-                      ),
-                      TextField(
-                        controller: _password,
-                        obscureText: true,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        decoration: InputDecoration(
-                          hintText: context.loc.password_text_field_placeholder,
+                        TextField(
+                          controller: _password,
+                          obscureText: true,
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          decoration: InputDecoration(
+                            hintText: context.loc.password_text_field_placeholder,
+                          ),
                         ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          final email = _email.text.trim();
-                          final password = _password.text.trim();
-                      
-                          if (email.isEmpty || password.isEmpty) {
-                            await showErrorDialog(
-                              context,
-                              context.loc.login_view_email_and_password_cannot_be_empty,
+                        TextButton(
+                          onPressed: () async {
+                            final email = _email.text.trim();
+                            final password = _password.text.trim();
+                        
+                            if (email.isEmpty || password.isEmpty) {
+                              await showErrorDialog(
+                                context,
+                                context.loc.login_view_email_and_password_cannot_be_empty,
+                              );
+                              return;
+                            }
+                            context.read<AuthBloc>().add(
+                              AuthEventLogIn(email: email, password: password),
                             );
-                            return;
-                          }
-                          context.read<AuthBloc>().add(
-                            AuthEventLogIn(email: email, password: password),
-                          );
-                        },
-                        child: Text(context.loc.login),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          context.read<AuthBloc>().add(const AuthEventForgotPassword());
-                        },
-                        child: Text(context.loc.login_view_forgot_password),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          context.read<AuthBloc>().add(const AuthEventShouldRegister());
-                        },
-                        child: Text(context.loc.login_view_not_registered_yet,),
-                      ),
-                      
-                    ],
+                          },
+                          child: Text(context.loc.login),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            context.read<AuthBloc>().add(const AuthEventForgotPassword());
+                          },
+                          child: Text(context.loc.login_view_forgot_password),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            context.read<AuthBloc>().add(const AuthEventShouldRegister());
+                          },
+                          child: Text(context.loc.login_view_not_registered_yet,),
+                        ),
+                        
+                      ],
+                    ),
                   ),
                 );
               default:

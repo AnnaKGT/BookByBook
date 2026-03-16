@@ -284,7 +284,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
               );
              
             default:
-             return const CircularProgressIndicator();
+             return Center(child: const CircularProgressIndicator());
           }
         },
         ),
