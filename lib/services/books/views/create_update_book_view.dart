@@ -86,14 +86,13 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     final widgetBook = context.getArgument<CloudBook>();
 
     if (widgetBook != null) {
-      final d = widgetBook.bookDate;
       _book = widgetBook;
       _textControllerTitle.text = widgetBook.bookTitle;
       _textControllerAuthor.text = widgetBook.bookAuthor;
       _textControllerNotes.text = widgetBook.bookNotes;
       _textControllerLink.text = widgetBook.bookLink;
       _currentRating = widgetBook.bookRating;
-      _selectedDate = DateTime(d.year, d.month, d.day);
+      _selectedDate = widgetBook.bookDate;
       return widgetBook;
     }
 

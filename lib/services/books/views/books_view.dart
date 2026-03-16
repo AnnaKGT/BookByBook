@@ -118,6 +118,9 @@ class _MainPageState extends State<MainPage> {
                     case ConnectionState.active:
                      if (snapshot.hasData) {
                       final allBooks = snapshot.data as Iterable<CloudBook>;
+                      // final allBooks = snapshot.data!.toList()
+                      //     ..sort((a, b) => b.bookDate.compareTo(a.bookDate));
+
                       return BooksListView(
                         books: allBooks, 
                         onDeleteBook: (book) async {
