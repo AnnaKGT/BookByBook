@@ -29,19 +29,20 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   late final TextEditingController _textControllerTitle;
   late final TextEditingController _textControllerNotes;
   late final TextEditingController _textControllerLink;
-  late DateTime _selectedDate = DateTime.now();
+  late DateTime _selectedDate;
   double _currentRating = 0.0;
 
   late Future<CloudBook> _bookFuture;
 
   @override
   void initState() {
+    final now = DateTime.now();
     _booksService = FirebaseCloudStorage();
     _textControllerAuthor = TextEditingController();
     _textControllerTitle = TextEditingController();
     _textControllerNotes = TextEditingController();
     _textControllerLink = TextEditingController();
-    _selectedDate = DateTime.now();
+    _selectedDate = DateTime(now.year, now.month, now.day);
     super.initState();
   }
 
@@ -85,13 +86,14 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     final widgetBook = context.getArgument<CloudBook>();
 
     if (widgetBook != null) {
+      final d = widgetBook.bookDate;
       _book = widgetBook;
       _textControllerTitle.text = widgetBook.bookTitle;
       _textControllerAuthor.text = widgetBook.bookAuthor;
       _textControllerNotes.text = widgetBook.bookNotes;
       _textControllerLink.text = widgetBook.bookLink;
       _currentRating = widgetBook.bookRating;
-      _selectedDate = widgetBook.bookDate;
+      _selectedDate = DateTime(d.year, d.month, d.day);
       return widgetBook;
     }
 
@@ -147,9 +149,9 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
     );
-    if (picked != null && picked != _selectedDate) {
+    if (picked != null) {
       setState(() {
-        _selectedDate = picked;
+        _selectedDate = DateTime(picked.year, picked.month, picked.day);
       });
       // Immediately persist the change
       _saveBookIfTitleIsNotEmpty();
