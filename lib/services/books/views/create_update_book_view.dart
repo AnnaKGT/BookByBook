@@ -1,3 +1,4 @@
+
 import 'package:book_by_book/extensions/list/buildcontext/loc.dart';
 import 'package:book_by_book/services/auth/auth_service.dart';
 import 'package:book_by_book/services/books/cloud_book.dart';
@@ -19,57 +20,67 @@ class CreateUpdateBookView extends StatefulWidget {
   State<CreateUpdateBookView> createState() => _CreateUpdateBookViewState();
 }
 
-
-
 class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
-
   CloudBook? _book;
   late final FirebaseCloudStorage _booksService;
   late final TextEditingController _textControllerAuthor;
   late final TextEditingController _textControllerTitle;
   late final TextEditingController _textControllerNotes;
   late final TextEditingController _textControllerLink;
-  late DateTime _selectedDate;
+
+  // FIX: nullable — not set until createOrGetExistingBook completes,
+  // preventing initState's DateTime.now() from overwriting an existing book's date.
+  DateTime? _selectedDate;
+
   double _currentRating = 0.0;
+  bool _listenersAttached = false;
 
   late Future<CloudBook> _bookFuture;
 
   @override
   void initState() {
-    final now = DateTime.now();
+    super.initState();
     _booksService = FirebaseCloudStorage();
     _textControllerAuthor = TextEditingController();
     _textControllerTitle = TextEditingController();
     _textControllerNotes = TextEditingController();
     _textControllerLink = TextEditingController();
-    _selectedDate = DateTime(now.year, now.month, now.day);
-    super.initState();
+    // FIX: _selectedDate is intentionally NOT set here.
+    // It will be set inside createOrGetExistingBook after the correct
+    // value (either existing book date or today for new books) is known.
   }
 
   @override
   void didChangeDependencies() {
-  super.didChangeDependencies();
-  _bookFuture = createOrGetExistingBook(context); // cache it here
-}
+    super.didChangeDependencies();
+    _bookFuture = createOrGetExistingBook(context);
+  }
+
+  // ── Listeners ────────────────────────────────────────────────────────────
 
   void _textControllerListener() async {
     final book = _book;
-    if (book == null) {
-      return;
-    }
+    final date = _selectedDate;
+    // FIX: guard — do not save if date hasn't been set yet
+    if (book == null || date == null) return;
 
     await _booksService.updateBook(
-      documentId: book.documentId, 
+      documentId: book.documentId,
       bookTitle: _textControllerTitle.text,
-      bookAuthor: _textControllerAuthor.text, 
+      bookAuthor: _textControllerAuthor.text,
       bookNotes: _textControllerNotes.text,
-      bookLink: _textControllerLink.text, 
+      bookLink: _textControllerLink.text,
       bookRating: _currentRating,
-      bookDate: _selectedDate,
-      );
+      bookDate: date,
+    );
   }
 
+  // FIX: guard with _listenersAttached flag so this is only called once,
+  // not on every FutureBuilder rebuild.
   void _setupTextControllerListener() {
+    if (_listenersAttached) return;
+    _listenersAttached = true;
+
     _textControllerAuthor.removeListener(_textControllerListener);
     _textControllerAuthor.addListener(_textControllerListener);
     _textControllerTitle.removeListener(_textControllerListener);
@@ -80,33 +91,39 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     _textControllerLink.addListener(_textControllerListener);
   }
 
+  // ── Book loading ──────────────────────────────────────────────────────────
 
   Future<CloudBook> createOrGetExistingBook(BuildContext context) async {
-
     final widgetBook = context.getArgument<CloudBook>();
 
     if (widgetBook != null) {
+      final d = widgetBook.bookDate;
       _book = widgetBook;
       _textControllerTitle.text = widgetBook.bookTitle;
       _textControllerAuthor.text = widgetBook.bookAuthor;
       _textControllerNotes.text = widgetBook.bookNotes;
       _textControllerLink.text = widgetBook.bookLink;
       _currentRating = widgetBook.bookRating;
-      _selectedDate = widgetBook.bookDate;
+      // FIX: set date from existing book — done here, not in initState
+      _selectedDate = DateTime(d.year, d.month, d.day);
       return widgetBook;
     }
 
     final existingBook = _book;
-    if (existingBook != null) {
-      return existingBook;
-    }
+    if (existingBook != null) return existingBook;
+
+    // New book — only now is it correct to default to today
+    final now = DateTime.now();
+    _selectedDate = DateTime(now.year, now.month, now.day);
 
     final currentUser = AuthService.firebase().currentUser!;
-    final userId = currentUser.id;
-    final newBook = await _booksService.createNewBook(ownerUserId: userId);
+    final newBook =
+        await _booksService.createNewBook(ownerUserId: currentUser.id);
     _book = newBook;
     return newBook;
   }
+
+  // ── Persistence helpers ───────────────────────────────────────────────────
 
   void _deleteBookIfTitleIsEmpty() {
     final book = _book;
@@ -115,36 +132,39 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     }
   }
 
-  void _saveBookIfTitleIsNotEmpty() async {
+  Future<void> _saveBookIfTitleIsNotEmpty() async {
     final book = _book;
-    final textTitle = _textControllerTitle.text;
-    final textAuthor = _textControllerAuthor.text;
-    final textNotes = _textControllerNotes.text;
-    final textLink = _textControllerLink.text;
-    if (textTitle.isNotEmpty && book != null) {
-      await _booksService.updateBook(
-        documentId: book.documentId, 
-        bookTitle: textTitle,
-        bookAuthor: textAuthor, 
-        bookNotes: textNotes,
-        bookLink: textLink, 
-        bookRating: _currentRating,
-        bookDate: _selectedDate,
-        );
-    }
+    final date = _selectedDate;
+    // FIX: guard — do not save if date hasn't been set yet
+    if (book == null || date == null) return;
+    if (_textControllerTitle.text.isEmpty) return;
+
+    await _booksService.updateBook(
+      documentId: book.documentId,
+      bookTitle: _textControllerTitle.text,
+      bookAuthor: _textControllerAuthor.text,
+      bookNotes: _textControllerNotes.text,
+      bookLink: _textControllerLink.text,
+      bookRating: _currentRating,
+      bookDate: date,
+    );
   }
 
-  String _formatDate(DateTime date) {
-    // Simple format — or use intl package for localization
+  // ── Date helpers ──────────────────────────────────────────────────────────
+
+  String _formatDate(DateTime? date) {
+    if (date == null) return '';
     return '${date.day.toString().padLeft(2, '0')}.'
         '${date.month.toString().padLeft(2, '0')}.'
         '${date.year}';
   }
 
   Future<void> _pickDate() async {
+    // FIX: fall back to today only if _selectedDate is somehow still null
+    final current = _selectedDate ?? DateTime.now();
     final picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDate,
+      initialDate: current,
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
     );
@@ -152,12 +172,27 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
       setState(() {
         _selectedDate = DateTime(picked.year, picked.month, picked.day);
       });
-      // Immediately persist the change
-      _saveBookIfTitleIsNotEmpty();
+      // Immediately persist the updated date
+      await _saveBookIfTitleIsNotEmpty();
     }
   }
 
- 
+  // ── Share ─────────────────────────────────────────────────────────────────
+
+  String _buildShareText() {
+    final buffer = StringBuffer();
+    buffer.writeln('📖 ${_textControllerTitle.text}');
+    if (_textControllerAuthor.text.isNotEmpty) {
+      buffer.writeln('✍️ ${_textControllerAuthor.text}');
+    }
+    if (_textControllerLink.text.isNotEmpty) {
+      buffer.writeln('🔗 ${_textControllerLink.text}');
+    }
+    return buffer.toString().trim();
+  }
+
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+
   @override
   void dispose() {
     _deleteBookIfTitleIsEmpty();
@@ -169,19 +204,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
     super.dispose();
   }
 
-  String _buildShareText() {
-    final title = _textControllerTitle.text;
-    final author = _textControllerAuthor.text;
-    final link = _textControllerLink.text;
-
-    final buffer = StringBuffer();
-    buffer.writeln('📖 $title');
-    if (author.isNotEmpty) buffer.writeln('✍️ $author');
-    if (link.isNotEmpty) buffer.writeln('🔗 $link');
-
-    return buffer.toString().trim();
-  }
-
+  // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -192,144 +215,149 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
         actions: [
           IconButton(
             onPressed: () async {
-
               final text = _textControllerTitle.text;
-
               if (_book == null || text.isEmpty) {
                 await showCannotShareEmptyBookDialog(context);
               } else {
-               await SharePlus.instance.share(ShareParams(text: _buildShareText()));
+                await SharePlus.instance
+                    .share(ShareParams(text: _buildShareText()));
               }
             },
             icon: const Icon(Icons.share),
-            ),
+          ),
           IconButton(
             onPressed: () async {
               final shouldDelete = await showDeleteDialog(context);
               if (shouldDelete) {
-               final book = _book;
-               if (book != null) {
-                await _booksService.deleteBook(documentId: book.documentId);
-                if (context.mounted) Navigator.of(context).pop();
+                final book = _book;
+                if (book != null) {
+                  await _booksService.deleteBook(documentId: book.documentId);
+                  if (context.mounted) Navigator.of(context).pop();
+                }
               }
-            }
-            }, 
-            icon: const Icon(Icons.delete)),
+            },
+            icon: const Icon(Icons.delete),
+          ),
         ],
-
       ),
       body: FutureBuilder(
-        future: _bookFuture, 
+        future: _bookFuture,
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
-            
             case ConnectionState.done:
+              // FIX: _setupTextControllerListener is guarded internally,
+              // so calling it here is safe even on rebuilds.
               _setupTextControllerListener();
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    
                     Text(
                       context.loc.author,
-                      style: TextStyle(fontSize: 14, color: Colors.grey)),
+                      style:
+                          const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
                     TextField(
-                     controller: _textControllerAuthor,
-                     decoration: const InputDecoration(
-                       hintText: ' '
+                      controller: _textControllerAuthor,
+                      decoration: const InputDecoration(hintText: ' '),
                     ),
-                      
-                    ),
-                    const SizedBox(height: 16,),
+                    const SizedBox(height: 16),
                     Text(
                       context.loc.title,
-                      style: TextStyle(fontSize: 14, color: Colors.grey)),
+                      style:
+                          const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
                     TextField(
                       controller: _textControllerTitle,
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
-                      decoration: const InputDecoration(
-                        hintText: ' '
-                      )
+                      decoration: const InputDecoration(hintText: ' '),
                     ),
-                    const SizedBox(height: 16,),
+                    const SizedBox(height: 16),
+                    // Date picker tile — shows the book's own date, not today
                     ListTile(
-                      // contentPadding: EdgeInsets.zero,
                       leading: const Icon(Icons.calendar_today),
                       title: Text(
-                        // 'Date added: ${_formatDate(_selectedDate)}',
                         _formatDate(_selectedDate),
                         style: const TextStyle(fontSize: 14),
                       ),
-                      // trailing: const Icon(Icons.edit, size: 18),
                       onTap: _pickDate,
                     ),
-                    const SizedBox(height: 16,),
+                    const SizedBox(height: 16),
                     Text(
                       context.loc.link,
-                      style: TextStyle(fontSize: 14, color: Colors.grey,)),
+                      style:
+                          const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
                     ValueListenableBuilder(
-                      valueListenable: _textControllerLink, 
+                      valueListenable: _textControllerLink,
                       builder: (context, value, _) {
                         return TextField(
-                      controller: _textControllerLink,
-                      keyboardType: TextInputType.url,
-                      textAlignVertical: TextAlignVertical.center,
-                      decoration: InputDecoration(
-                        hintText: ' ',
-                        suffixIcon: value.text.isNotEmpty ? IconButton(
-                          onPressed: () => launchLink(_textControllerLink.text), 
-                          icon: const Icon(Icons.open_in_new, size: 16))
-                          : null,
-                        )
-                      );
-                      })
-                    ,
-                   
-                    const SizedBox(height: 24,),
+                          controller: _textControllerLink,
+                          keyboardType: TextInputType.url,
+                          textAlignVertical: TextAlignVertical.center,
+                          decoration: InputDecoration(
+                            hintText: ' ',
+                            suffixIcon: value.text.isNotEmpty
+                                ? IconButton(
+                                    onPressed: () =>
+                                        launchLink(_textControllerLink.text),
+                                    icon: const Icon(Icons.open_in_new,
+                                        size: 16),
+                                  )
+                                : null,
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 24),
                     Text(
                       context.loc.how_do_you_like_the_book,
-                      style: TextStyle(fontSize: 14, color: Colors.grey)
+                      style:
+                          const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     RatingField(
-                      initialRating: _currentRating == 0.0 ? 1.0 : _currentRating, 
+                      initialRating:
+                          _currentRating == 0.0 ? 1.0 : _currentRating,
                       onRatingUpdate: (rating) async {
                         setState(() => _currentRating = rating);
                         final book = _book;
-                        if (book != null) {
+                        final date = _selectedDate;
+                        if (book != null && date != null) {
                           await _booksService.updateBook(
-                            documentId: book.documentId, 
-                            bookTitle: _textControllerTitle.text, 
-                            bookAuthor: _textControllerAuthor.text, 
+                            documentId: book.documentId,
+                            bookTitle: _textControllerTitle.text,
+                            bookAuthor: _textControllerAuthor.text,
                             bookNotes: _textControllerNotes.text,
-                            bookLink: _textControllerLink.text, 
+                            bookLink: _textControllerLink.text,
                             bookRating: rating,
-                            bookDate: _selectedDate,
-                            );
+                            bookDate: date,
+                          );
                         }
-                      }),
-                    const SizedBox(height: 16,),
+                      },
+                    ),
+                    const SizedBox(height: 16),
                     Text(
                       context.loc.notes,
-                      style: TextStyle(fontSize: 14, color: Colors.grey)),
+                      style:
+                          const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
                     TextField(
                       controller: _textControllerNotes,
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
-                      decoration: const InputDecoration(
-                        hintText: ' ',
-                      )
+                      decoration: const InputDecoration(hintText: ' '),
                     ),
                   ],
                 ),
               );
-             
+
             default:
-             return Center(child: const CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
           }
         },
-        ),
+      ),
     );
   }
 }
