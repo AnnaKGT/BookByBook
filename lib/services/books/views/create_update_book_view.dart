@@ -196,7 +196,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   @override
   void dispose() {
     _deleteBookIfTitleIsEmpty();
-    _saveBookIfTitleIsNotEmpty();
+    // _saveBookIfTitleIsNotEmpty();
     _textControllerAuthor.dispose();
     _textControllerTitle.dispose();
     _textControllerNotes.dispose();
@@ -277,9 +277,10 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                     const SizedBox(height: 16),
                     // Date picker tile — shows the book's own date, not today
                     ListTile(
+                      
                       leading: const Icon(Icons.calendar_today),
                       title: Text(
-                        _formatDate(_selectedDate),
+                        _formatDate(_book?.bookDate),
                         style: const TextStyle(fontSize: 14),
                       ),
                       onTap: _pickDate,
