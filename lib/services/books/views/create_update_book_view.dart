@@ -34,6 +34,8 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
 
   double _currentRating = 0.0;
   bool _listenersAttached = false;
+  bool _bookFutureInitialized = false;
+
 
   late Future<CloudBook> _bookFuture;
 
@@ -53,7 +55,11 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _bookFuture = createOrGetExistingBook(context);
+    if (!_bookFutureInitialized) {         
+      _bookFutureInitialized = true;
+      _bookFuture = createOrGetExistingBook(context);
+    }
+    // _bookFuture = createOrGetExistingBook(context);
   }
 
   // ── Listeners ────────────────────────────────────────────────────────────
@@ -280,7 +286,7 @@ class _CreateUpdateBookViewState extends State<CreateUpdateBookView> {
                       
                       leading: const Icon(Icons.calendar_today),
                       title: Text(
-                        _formatDate(_book?.bookDate),
+                        _formatDate(_selectedDate),
                         style: const TextStyle(fontSize: 14),
                       ),
                       onTap: _pickDate,
